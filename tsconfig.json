@@ -1,0 +1,79 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "module": "commonjs",
+    "rootDir": "./src",
+    "baseUrl": "./",
+    "paths": {
+      "@constants/*": [
+        "./src/constants/*"
+      ],
+      "@models": [
+        "./src/models"
+      ],
+      "@loaders/*": [
+        "./src/loaders/*"
+      ],
+      "@logger": [
+        "./src/logger"
+      ],
+      "@routes/initializer": [
+        "./src/routes"
+      ],
+      "@middleware/*": [
+        "./src/middleware/*"
+      ],
+      "@config": [
+        "./src/config"
+      ],
+      "@utils/*": [
+        "./src/util/*"
+      ],
+      "@service/*": [
+        "./src/service/*"
+      ],
+      "@helpers/*": [
+        "./src/helpers/*"
+      ],
+      "@controller/*": [
+        "./src/controller/*"
+      ],
+      "@validations": [
+        "./src/validations"
+      ],
+      "@mongodb/helpers/*":[
+        "src/datasources/mongodb/helpers/*"
+      ],
+      "@mongodb/models/*":[
+        "src/datasources/mongodb/models/*"
+      ],
+      "@db/queries": [
+        "src/datasources/pgsql/query_handlers"
+      ],
+      "@db/helpers/*": [
+        "src/datasources/pgsql/helpers/*"
+      ],
+      "@cache": [
+        "./src/datasources/cache"
+      ]
+    },
+    "rootDirs": [
+      "src"
+    ],
+    "resolveJsonModule": true,
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": false,
+    "strictNullChecks": false,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

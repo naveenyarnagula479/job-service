@@ -3,6 +3,8 @@ import logger from '@logger';
 import {
     BaseListAPIRequest,
     IBaseListAPIRequest,
+    ITemplatesListAPIRequest,
+    TemplatesListAPIRequest,
 } from '@models';
 
 
@@ -29,6 +31,26 @@ export function requestQueryDataMapping(query: any): IBaseListAPIRequest {
     }
 }
 
-
+export function requestTemplatesListQueryMapping(query: any): ITemplatesListAPIRequest {
+    logger.info('helpers.data_mapping.request_query.requestTemplatesListQueryMapping() ');
+    try {
+        if (query?.pageNum === '') {
+            query.pageNum = Pagination.PAGE_NUM;
+        }
+        if (query?.pageSize === '') {
+            query.pageSize = Pagination.PAGE_SIZE;
+        }
+        return new TemplatesListAPIRequest(
+            query?.searchText,
+            query?.pageNum,
+            query?.pageSize,
+            query?.categoryId,
+           
+        )
+    } catch (error) {
+        logger.error(`ERROR occurred in helpers.data_mapping.request_query.requestTemplatesListQueryMapping() `);
+        throw error;
+    }
+}
 
 

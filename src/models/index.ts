@@ -13,14 +13,16 @@ import { IJwtPayload, JwtPayload } from './lib/jwt_payload';
 import { IServiceResponse, ServiceResponse } from './lib/service_response';
 import { IUserSession, UserSession } from './lib/user_session';
 import { IBillingAddress, BillingAddress } from './lib/course_orders';
-
-
+import { ITemplates, templates } from './lib/templates';
+import { IMasterTemplates, masterTemplates } from './lib/master_templates'
+import { TemplatesListAPIRequest, ITemplatesListAPIRequest } from './lib/api_requests/templates_list_api_request';
 
 export {
     APIError, AppError, AuditInfo, BaseListAPIRequest, BaseRecord, BaseRecordAudit, EmailRecipient,
     EmailSender, IAPIError, IAssignments, IAuditInfo, IBaseListAPIRequest, IBaseRecord, IBaseRecordAudit,
     ICourseDetails, IEmailRecipient, IEmailSender, IJwtPayload, ILessonDetails, IListAPIResponse, IModuleDetails, ISectionDetails,
     IServiceResponse, ITestDetails, IUserSession, JwtPayload, ListAPIResponse, SectionDetails, ServiceResponse,
-    UserSession, assignment, courseDetails, lessonDetails, moduleDetails, testDetails, BillingAddress, IBillingAddress, 
+    UserSession, assignment, courseDetails, lessonDetails, moduleDetails, testDetails, BillingAddress, IBillingAddress, templates, ITemplates,
+    masterTemplates, IMasterTemplates, TemplatesListAPIRequest, ITemplatesListAPIRequest
 };
 

@@ -1,7 +1,7 @@
 
-import * as FileData from './lib/file';
+import * as templatesData from './lib/templates';
 
 export {
-    FileData
+    templatesData
 };
 

@@ -5,6 +5,6 @@ import v1Routes from './v1';
 
 export default function initializeRoutes(app: Application) {
     log.info('initializeRoutes()');
-    app.use('/api/v1/cs/', v1Routes);
+    app.use('/api/v1/js/', v1Routes);
     app.use(errorHandler);
 }

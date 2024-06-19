@@ -16,10 +16,13 @@ const jdTemplateSchema = new mongoose.Schema({
         required: true,
         unique: true},
     job_title: { 
-        type: String
+        type: String,
+        required: true,
+        unique: true
        },
     description: { 
-        type: String},
+        type: String,
+        required: true},
     tools: { 
         type: Array},
     skills: { 

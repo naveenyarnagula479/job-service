@@ -44,7 +44,7 @@ export async function addJDTemplates(payload: ITemplates, userId: number, progra
     }
     export async function checkJobTitleNameExists(jobTitleName: string, categoryId: number, jdTemplateUid?: string) {
         logger.info(TAG + '.checkJobTitleNameExists()');
-    
+       console.log("12345", jobTitleName, categoryId, jdTemplateUid)
         try {
             const pipeLine = [{
                 $lookup: {
@@ -70,7 +70,7 @@ export async function addJDTemplates(payload: ITemplates, userId: number, progra
                 }
             }]
             const result = toCamelCase(await joinTables(JDTemplates, pipeLine));
-          
+          console.log('6789',result.length)
             if (result.length > 0) {
                 throw new AppError('job title  already exist', HttpStatusCodes.BAD_REQUEST);
             }

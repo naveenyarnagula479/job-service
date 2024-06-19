@@ -8,7 +8,7 @@ import { templatesData } from '@db/queries'
 
 const TAG = 'service.templates'
 
-export async function saveMasterTemplates(userSession, templates: IMasterTemplates){
+export async function saveMasterTemplates(userSession, templates: IMasterTemplates): Promise<IServiceResponse>{
     logger.info(`${TAG}.saveMasterTemplates() ==> `);
     let connection = null;
     const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.CREATED, 'Master templates created successfully');
@@ -27,7 +27,7 @@ export async function saveMasterTemplates(userSession, templates: IMasterTemplat
     return serviceResponse;
 
 }
-export async function getMasterTemplates(userSession: IUserSession){
+export async function getMasterTemplates(userSession: IUserSession): Promise<IServiceResponse>{
     logger.info(`${TAG}.getMasterTemplates()`);
     let connection = null;
     const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK,'Master Templates fetched sucessfully')
@@ -65,7 +65,7 @@ export async function saveTemplates(userSession, templates: ITemplates){
         }
         
     }catch(error){
-        await rollBackTransaction(connection);
+    
         logger.error(`ERROR occured in ${TAG}.saveTemplates() `, error);
         serviceResponse.addServerError(`Failed to save templates due to technical difficulties`);
         throw error;
@@ -75,7 +75,7 @@ export async function saveTemplates(userSession, templates: ITemplates){
     return serviceResponse;
 
 }
-export async function getTemplates(queryParams: any,userSession: IUserSession){
+export async function getTemplates(queryParams: any,userSession: IUserSession): Promise<IServiceResponse>{
     logger.info(`${TAG}.getTemplates()`);
     let connection = null;
     const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK,'Templates fetched sucessfully')
@@ -93,7 +93,6 @@ export async function getTemplates(queryParams: any,userSession: IUserSession){
         }
          
     }catch(error){
-        await rollBackTransaction(connection);
         logger.error(`ERROR occured in ${TAG}.getTemplates()`, error);
         serviceResponse.addServerError(`Failed to fetch templates due to technical difficulties`);
         throw error;
@@ -103,15 +102,15 @@ export async function getTemplates(queryParams: any,userSession: IUserSession){
     return serviceResponse;
 };
 
-export async function updateTemplatesByUid(userSession: IUserSession, templates: ITemplates, templateUid: any){
+export async function updateTemplatesByUid(userSession: IUserSession, templates: ITemplates, templateUid: any): Promise<IServiceResponse>{
     logger.info(`${TAG}.updateTemplatesByUid() `);
     let connection = null;
     const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, 'templates updated successfully');
     try{
         connection = await getConnection();
+        await templateData.checkJobTitleNameExists(templates.jobTitle, templates.categoryId, templateUid)
         const jdTemplateUid = await templateData.getTemplateByUid(templateUid)
         if(jdTemplateUid?.uid){
-             await templateData.checkJobTitleNameExists(templates.jobTitle, templates.categoryId)
              const templateDetails= await templateData.updateTemplatesByUid(templates,templateUid,userSession.userId);
              serviceResponse.data={
                 templateUid: templateDetails.uid
@@ -123,7 +122,7 @@ export async function updateTemplatesByUid(userSession: IUserSession, templates:
 
         
     }catch(error){
-        await rollBackTransaction(connection);
+     
         serviceResponse.addServerError(`Failed to update templates due to technical difficulties`);
         throw error;
     }finally{
@@ -132,7 +131,7 @@ export async function updateTemplatesByUid(userSession: IUserSession, templates:
     return serviceResponse;
 }
 
-export async function getTemplatesByUid(userSession: IUserSession, templateUid){
+export async function getTemplatesByUid(userSession: IUserSession, templateUid): Promise<IServiceResponse>{
     logger.info(`${TAG}.getTemplatesByUid() `);
     let connection = null;
     const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, 'templates fetched successfully' );
@@ -147,13 +146,15 @@ export async function getTemplatesByUid(userSession: IUserSession, templateUid){
         serviceResponse.addBadRequestError('Template Uid does\t exist')
     }
     }catch(error){
-        await rollBackTransaction(connection);
+       
         serviceResponse.addServerError(`Failed to get templates due to technical difficulties`);
         throw error;
+    }finally {
+        await releaseConnection(connection);
     }
     return serviceResponse;
 }
-export async function deleteTemplatesByUid(userSession: IUserSession, templateUid){
+export async function deleteTemplatesByUid(userSession: IUserSession, templateUid): Promise<IServiceResponse>{
     logger.info(`${TAG}.deleteTemplatesByUid() `);
     let connection = null;
     const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, 'templates deleted sucessfully');
@@ -169,9 +170,11 @@ export async function deleteTemplatesByUid(userSession: IUserSession, templateUi
         serviceResponse.addBadRequestError('Template Uid does\t exist')
     }
     }catch(error){
-        await rollBackTransaction(connection);
+     
         serviceResponse.addServerError(`Failed to delete templates due to technical difficulties`);
         throw error;
+    }finally {
+        await releaseConnection(connection);
     }
     return serviceResponse;
 }

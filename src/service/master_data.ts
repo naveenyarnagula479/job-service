@@ -212,7 +212,7 @@ export async function getEmploymentTypeByUid(employmentTypeUid: string, userSess
   const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, "employment type fetched successfully");
   try {
     connection = await getConnection();
-    const isTypeExist = await MasterData.checkJobTypeUidExist(connection, employmentTypeUid);
+    const isTypeExist = await MasterData.checkEmploymentTypeUidExist(connection, employmentTypeUid);
     if (!isTypeExist) {
       serviceResponse.addBadRequestError("employment type uid doesn't exist")
     } else {

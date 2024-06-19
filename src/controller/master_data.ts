@@ -365,7 +365,7 @@ export async function updateInterviewRound(req : any, res : Response, next : Nex
     logger.info(TAG + '.updateInterviewRound()');
     try{
         const userSession : IUserSession = req.userSession;
-        const interviewRoundUid = req.params.interViewRoundUid
+        const interviewRoundUid = req.params.interviewRoundUid
         const interviewRoundDetails : IMasterData = await masterDataMapping(req.body)
         const response : IServiceResponse = await MasterData.updateInterviewRound(interviewRoundDetails, interviewRoundUid,userSession)
         responseBuilder(response, res, next, req)
@@ -405,7 +405,7 @@ export async function getInterviewRoundsByUid(req : any, res : Response, next : 
     logger.info(TAG + '.getInterviewRoundsByUid');
     try{
         const userSession : IUserSession = req.userSession;
-        const interviewRoundUid = req.params.interViewRoundUid
+        const interviewRoundUid = req.params.interviewRoundUid
         const response : IServiceResponse = await MasterData.getInterviewRoundsByUid(interviewRoundUid,userSession)
         responseBuilder(response, res, next, req)
     }catch(error){

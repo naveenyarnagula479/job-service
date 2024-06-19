@@ -665,7 +665,7 @@ export async function deleteInterviewRound(connection: PoolClient, interViewRoun
 export async function getInterviewRounds(connection : PoolClient,queryParams : number, userSession : IUserSession){
     logger.info(`${TAG}.getInterviewRounds() ` );
     try{
-        let query  : string = `select ir.name, cc.category_name , ir.is_deleted, ir.created_by, ir.created_by_name,ir.created_at,ir.updated_by, ir.updated_at, ir.updated_by_name from interview_rounds ir join course_categories cc on ir.course_category_id = cc.id `
+        let query  : string = `select ir.name, ir.uid, cc.category_name , ir.is_deleted, ir.created_by, ir.created_by_name,ir.created_at,ir.updated_by, ir.updated_at, ir.updated_by_name from interview_rounds ir join course_categories cc on ir.course_category_id = cc.id `
         if(queryParams){
             query  = `${query} where course_category_id = ${queryParams} and ir.is_deleted = false`
         }else {
@@ -680,11 +680,11 @@ export async function getInterviewRounds(connection : PoolClient,queryParams : n
     }
 }
 
-export async function getInterviewRoundsByUid(connection : PoolClient,interViewRoundUid : string, userSession : IUserSession){
+export async function getInterviewRoundsByUid(connection : PoolClient,interviewRoundUid : string, userSession : IUserSession){
     logger.info(`${TAG}.getInterviewRoundsByUid() ` );
     try{
-        const query  : string = `select ir.name, cc.category_name , ir.is_deleted, ir.created_by, ir.created_by_name,ir.created_at,ir.updated_by, ir.updated_at, ir.updated_by_name from interview_rounds ir join course_categories cc on ir.course_category_id = cc.id where uid = $1 and ir.is_deleted = false`;
-        const result = await fetchRecord(connection, query, [interViewRoundUid]);
+        const query  : string = `select ir.name,ir.uid, cc.category_name , ir.is_deleted, ir.created_by, ir.created_by_name,ir.created_at,ir.updated_by, ir.updated_at, ir.updated_by_name from interview_rounds ir join course_categories cc on ir.course_category_id = cc.id where uid = $1 and ir.is_deleted = false`;
+        const result = await fetchRecord(connection, query, [interviewRoundUid]);
         return result
     }catch(error){
         logger.error(`ERROR occurred in ${TAG}.getInterviewRoundsByUid() `, error);

@@ -13,6 +13,7 @@ import { IJwtPayload, JwtPayload } from './lib/jwt_payload';
 import { IServiceResponse, ServiceResponse } from './lib/service_response';
 import { IUserSession, UserSession } from './lib/user_session';
 import { IBillingAddress, BillingAddress } from './lib/course_orders';
+import { MasterDataDetails, IMasterData } from './lib/master_data';
 
 
 
@@ -21,6 +22,6 @@ export {
     EmailSender, IAPIError, IAssignments, IAuditInfo, IBaseListAPIRequest, IBaseRecord, IBaseRecordAudit,
     ICourseDetails, IEmailRecipient, IEmailSender, IJwtPayload, ILessonDetails, IListAPIResponse, IModuleDetails, ISectionDetails,
     IServiceResponse, ITestDetails, IUserSession, JwtPayload, ListAPIResponse, SectionDetails, ServiceResponse,
-    UserSession, assignment, courseDetails, lessonDetails, moduleDetails, testDetails, BillingAddress, IBillingAddress, 
+    UserSession, assignment, courseDetails, lessonDetails, moduleDetails, testDetails, BillingAddress, IBillingAddress, MasterDataDetails, IMasterData
 };
 

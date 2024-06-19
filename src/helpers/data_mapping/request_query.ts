@@ -3,6 +3,8 @@ import logger from '@logger';
 import {
     BaseListAPIRequest,
     IBaseListAPIRequest,
+    IMasterData,
+    MasterDataDetails,
 } from '@models';
 
 

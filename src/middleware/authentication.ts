@@ -45,7 +45,7 @@ export function isAuthenticated(
         decodedToken.email,
         decodedToken.phone,
         decodedToken.role,
-        null,
+        decodedToken.firstName + ' ' + decodedToken.lastName,
         decodedToken.otpType,
         decodedToken.isEmailVerified,
         decodedToken.isPhoneVerified
@@ -113,7 +113,8 @@ export function isAdmin(req: any, res: Response, next: NextFunction): void {
           null,
           decodedToken.email,
           null,
-          decodedToken.role
+          decodedToken.role,
+          decodedToken.firstName + ' ' + decodedToken.lastName
         )
         // req.tokenType = decodedToken.tokenType
         logger.debug('LOGGED IN USER:' + nodeUtil.inspect(req.userSession))
@@ -189,7 +190,8 @@ export function isUser(userTypes: string[]) {
             decodedToken.userUID,
             decodedToken.email,
             decodedToken.phone,
-            decodedToken.role
+            decodedToken.role,
+            decodedToken.firstName + ' ' + decodedToken.lastName
           )
           req.tokenType = decodedToken.tokenType
           logger.debug('LOGGED IN USER:' + nodeUtil.inspect(req.userSession))

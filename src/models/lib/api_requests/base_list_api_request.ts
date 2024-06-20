@@ -22,7 +22,7 @@ export class BaseListAPIRequest implements IBaseListAPIRequest {
   public fromDate?: string
   public toDate?: string
 
-  constructor (searchText: string, pageNum?: number, pageSize?: number, queryId?: string, sortBy?: string,
+  constructor(searchText: string, pageNum?: number, pageSize?: number, queryId?: string, sortBy?: string,
     sortOrder?: string, fromDate?: string, toDate?: string) {
     this.searchText = searchText
     this.pageNum = typeof pageNum !== 'undefined' ? +pageNum : Pagination.PAGE_NUM
@@ -32,5 +32,30 @@ export class BaseListAPIRequest implements IBaseListAPIRequest {
     this.sortOrder = sortOrder ?? SORT_ORDER
     this.fromDate = fromDate
     this.toDate = toDate
+  }
+}
+
+
+export interface IMasterDataListAPIRequest extends IBaseListAPIRequest {
+  categoryId?: number
+}
+
+export class MasterDataListAPIRequest
+  extends BaseListAPIRequest
+  implements IMasterDataListAPIRequest {
+  public categoryId?: number
+
+  constructor(
+    searchText: string,
+    pageNum: number,
+    pageSize: number,
+    queryId?: string,
+    sortBy?: string,
+    sortOrder?: string,
+    categoryId?: number
+  ) {
+    super(searchText, pageNum, pageSize, queryId, sortBy, sortOrder)
+
+    this.categoryId = categoryId
   }
 }

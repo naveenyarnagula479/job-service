@@ -1,9 +1,8 @@
-import { Pagination } from '@constants/app_defaults';
 import logger from '@logger';
 import {
     IMasterData,
     MasterDataDetails,
-} from '@models'
+} from '@models';
 
 
 export function masterDataMapping(payload: any): IMasterData {

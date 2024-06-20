@@ -14,8 +14,10 @@ import { IServiceResponse, ServiceResponse } from './lib/service_response';
 import { IUserSession, UserSession } from './lib/user_session';
 import { IBillingAddress, BillingAddress } from './lib/course_orders';
 import { ITemplates, templates } from './lib/templates';
-import { IMasterTemplates, masterTemplates } from './lib/master_templates'
+import { IMasterTemplates, masterTemplates } from './lib/master_templates';
+import { IJobs, jobs } from './lib/jobs';
 import { TemplatesListAPIRequest, ITemplatesListAPIRequest } from './lib/api_requests/templates_list_api_request';
+import { JobsListAPIRequest, IJobsListAPIRequest } from './lib/api_requests/jobs_list_api_request';
 
 export {
     APIError, AppError, AuditInfo, BaseListAPIRequest, BaseRecord, BaseRecordAudit, EmailRecipient,
@@ -23,6 +25,6 @@ export {
     ICourseDetails, IEmailRecipient, IEmailSender, IJwtPayload, ILessonDetails, IListAPIResponse, IModuleDetails, ISectionDetails,
     IServiceResponse, ITestDetails, IUserSession, JwtPayload, ListAPIResponse, SectionDetails, ServiceResponse,
     UserSession, assignment, courseDetails, lessonDetails, moduleDetails, testDetails, BillingAddress, IBillingAddress, templates, ITemplates,
-    masterTemplates, IMasterTemplates, TemplatesListAPIRequest, ITemplatesListAPIRequest
+    masterTemplates, IMasterTemplates, TemplatesListAPIRequest, ITemplatesListAPIRequest, IJobs, jobs, JobsListAPIRequest, IJobsListAPIRequest
 };
 

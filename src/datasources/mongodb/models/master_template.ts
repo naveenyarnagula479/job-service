@@ -1,29 +1,30 @@
 import mongoose from "mongoose";
 
-
 const modelName = "master_templates";
 
 const masterTemplateSchema = new mongoose.Schema({
-    uid: { type: String,
+    master_template_uid: { type: String,
         required: true,
         unique: true},
     job_title: { 
-        type: String
+        type: String,
+        required: true
        },
     description: { 
-        type: String},
+        type: String,
+        required: true},
     tools: { 
-        type: Array},
+        type: JSON},
     skills: { 
-        type: Array },
+        type: JSON },
     employment_type: { 
-        type: Array},
+        type: JSON},
     job_type: { 
-        type: Array},
+        type: JSON},
     shifts: { 
-        type: Array},
+        type: JSON},
     interview: { 
-        type: Array },
+        type: JSON },
     job_summary: { 
         type: String, 
         required: true },

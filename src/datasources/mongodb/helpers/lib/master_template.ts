@@ -12,7 +12,7 @@ export async function addMasterTemplates(payload: IMasterTemplates, userId: numb
     logger.info(TAG + '.addMasterTemplates()');
     try {
         const masterTemplates = new MasterTemplates({
-            uid: new mongoose.Types.ObjectId(),
+            master_template_uid: new mongoose.Types.ObjectId(),
             job_title: payload.jobTitle,
             description: payload.description,
             tools: payload.tools,

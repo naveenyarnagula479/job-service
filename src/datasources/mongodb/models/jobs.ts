@@ -1,10 +1,12 @@
 import mongoose from "mongoose";
-import { json } from "stream/consumers";
 
+const modelName = "recruiter_jobs";
 
-const modelName = "admin_templates";
-
-const jdTemplateSchema = new mongoose.Schema({
+const jobsSchema = new mongoose.Schema({
+    template_uid:{
+        type: String,
+        requierd: true
+    },
     category_id:{
         type: Number,
         required: true
@@ -13,13 +15,12 @@ const jdTemplateSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    template_uid: { type: String,
+    job_uid: { type: String,
         required: true,
         unique: true},
     job_title: { 
         type: String,
         required: true,
-        unique: true
        },
     description: { 
         type: String,
@@ -38,7 +39,7 @@ const jdTemplateSchema = new mongoose.Schema({
         required: true},
     shifts: { 
         type: JSON,
-        required: true},
+        required: true}, 
     interview: { 
         type: JSON,
         required: true },
@@ -76,6 +77,11 @@ const jdTemplateSchema = new mongoose.Schema({
         type: Boolean,
         default: false
         },
+    job_status: {
+            type: String,
+            enum: ['DRAFTED', 'ACTIVE', 'INACTIVE'],
+            required: true
+        },
     created_by: { 
         type: Number, 
         required: true },
@@ -93,4 +99,4 @@ const jdTemplateSchema = new mongoose.Schema({
     }
 });
 
-export default mongoose.model(modelName, jdTemplateSchema);
+export default mongoose.model(modelName, jobsSchema);

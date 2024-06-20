@@ -2,16 +2,16 @@ import logger from "@logger";
 import JDTemplates  from '@mongodb/models/jd_template';
 import mongoose from "mongoose";
 import { toCamelCase } from "@utils/formatter";
-import {  AppError, ITemplates } from "@models";
+import {  ITemplates } from "@models";
 import { findOne, findOneAndUpdate, joinTables, findAllRecords } from '../query';
-import { HttpStatusCodes } from "@constants/status_codes";
+
 
 const TAG = 'datasources.mongodb.helpers.lib.jd_templates';
 export async function addJDTemplates(payload: ITemplates, userId: number, programId: number) {
         logger.info(TAG + '.addJDTemplates()');
         try {
             const jdTemplates = new JDTemplates({
-                uid: new mongoose.Types.ObjectId(),
+                template_uid: new mongoose.Types.ObjectId(),
                 category_id: payload.categoryId,
                 program_id: programId,
                 job_title: payload.jobTitle,
@@ -44,38 +44,9 @@ export async function addJDTemplates(payload: ITemplates, userId: number, progra
     }
     export async function checkJobTitleNameExists(jobTitleName: string, categoryId: number, jdTemplateUid?: string) {
         logger.info(TAG + '.checkJobTitleNameExists()');
-       console.log("12345", jobTitleName, categoryId, jdTemplateUid)
         try {
-            const pipeLine = [{
-                $lookup: {
-                    from:JDTemplates.modelName,
-                    localField: 'uid',
-                    foreignField: 'uid',
-                    as: 'templateInfo'
-                }
-            },
-            {
-                $match: {
-                   category_id : categoryId,
-                    'templateInfo.job_title': { $regex: `^${jobTitleName}$`, $options: 'i' },
-                    'templateInfo.is_deleted': false,
-                    ...(jdTemplateUid && { 'templateInfo.uid': { $ne: jdTemplateUid } })
-                }
-            },
-            {
-                $project: {
-                    _id: 0,
-                    category_id: 1,
-                    job_title: { $arrayElemAt: ['$testInfo.job_title', 0] }
-                }
-            }]
-            const result = toCamelCase(await joinTables(JDTemplates, pipeLine));
-          console.log('6789',result.length)
-            if (result.length > 0) {
-                throw new AppError('job title  already exist', HttpStatusCodes.BAD_REQUEST);
-            }
-          
-    
+         const result = await findAllRecords(JDTemplates,{'category_id': categoryId, 'job_title': jobTitleName, 'is_deleted':false},{_id:0})
+            return result;
         } catch (error) {
             logger.error(`ERROR occurred in ${TAG}.checkJobTitleNameExists() `, error);
             throw error;
@@ -92,19 +63,16 @@ export async function addJDTemplates(payload: ITemplates, userId: number, progra
         }
     }
     export async function getTemplateByUid(jdTemplateUid: string) {
-  
         logger.info(TAG + '.getTemplateByUid ');
         try {
-            const result = await findOne(JDTemplates, { 'uid': jdTemplateUid, 'is_deleted': false }, { _id: 0 });
+            const result = await findOne(JDTemplates, { 'template_uid': jdTemplateUid, 'is_deleted': false }, { _id: 0 });
             return toCamelCase(result?.toObject());
         } catch (error) {
             logger.error(`ERROR occurred in ${TAG}.getTemplateByUid() `, error);
             throw error;
         }
     }
-    
     export async function updateTemplatesByUid(templateDetails: any, templateUid: string, userId: number) {
-       
         logger.info(`${TAG}.updateTemplatesByUid() `);
         try {
             // const existingTemplate = await findOne(JDTemplates, { 'uid': templateUid, 'is_deleted': false }, { _id: 0 });
@@ -116,7 +84,7 @@ export async function addJDTemplates(payload: ITemplates, userId: number, progra
             //     return tool;
             // });
             const result = await findOneAndUpdate(JDTemplates,
-                { 'uid': templateUid, 'is_deleted': false },
+                { 'template_uid': templateUid, 'is_deleted': false },
                 {
                     job_title: templateDetails.jobTitle,
                     description: templateDetails.description,
@@ -138,8 +106,7 @@ export async function addJDTemplates(payload: ITemplates, userId: number, progra
                     experience: templateDetails.experience,
                     updated_at: new Date(),
                     updated_by: userId
-                });
-                
+                }); 
                 return result
            
         } catch (error) {
@@ -151,15 +118,12 @@ export async function addJDTemplates(payload: ITemplates, userId: number, progra
         logger.info(TAG + '.deleteTemplatesByUid() ');
         try {
             const result = await findOneAndUpdate(JDTemplates,
-                { 'uid': templateUid, 'is_deleted': false },
+                { 'template_uid': templateUid, 'is_deleted': false },
                 {
                     is_deleted: true,
                     updated_by: userId,
                     updated_at: new Date()
                 });
-            if (!result) {
-                throw new AppError(`template Uid doesn't exist`, HttpStatusCodes.BAD_REQUEST);
-            }
         } catch (error) {
             logger.error(`ERROR occurred in ${TAG}.deleteTemplatesByUid() `, error);
             throw error;

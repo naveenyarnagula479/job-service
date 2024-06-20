@@ -3,7 +3,6 @@ import { responseBuilder } from '@helpers/response_builder';
 import logger from '@logger';
 import { IServiceResponse, ITemplates, IUserSession, IMasterTemplates } from '@models';
 import { NextFunction, Response } from 'express';
-import nodeUtil from 'util';
 import * as templateService from '@service/templates';
 import { requestTemplatesListQueryMapping } from '@helpers/data_mapping/request_query';
 
@@ -27,7 +26,7 @@ export async function getMasterTemplates(req: any, res:Response, next: NextFunct
     try{
         logger.info(TAG + `getMasterTemplates()`);
         const userSession : IUserSession = req.userSession;
-        const masterTemplateResponse: IServiceResponse = await templateService.getMasterTemplates(userSession)
+        const masterTemplateResponse: IServiceResponse = await templateService.getMasterTemplates(userSession);
         responseBuilder(masterTemplateResponse, res, next, req);
     }catch(error){
         logger.error(`ERROR occured in ${TAG}.getMasterTemplates() `);
@@ -54,7 +53,7 @@ export async function getTemplates(req: any, res:Response, next: NextFunction):P
         logger.info(TAG + `getTemplates()`);
         const userSession : IUserSession = req.userSession;
         const queryParams = requestTemplatesListQueryMapping(req.query);
-        const templateResponse: IServiceResponse = await templateService.getTemplates(queryParams,userSession)
+        const templateResponse: IServiceResponse = await templateService.getTemplates(queryParams,userSession);
         responseBuilder(templateResponse, res, next, req);
     }catch(error){
         logger.error(`ERROR occured in ${TAG}.getTemplates() `);

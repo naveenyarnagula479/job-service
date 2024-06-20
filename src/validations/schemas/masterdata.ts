@@ -132,7 +132,20 @@ export const list = {
   }
 
 
-
+  export const getMasterDataWithCategoryId = {
+    ...list,
+    properties: {
+        categoryId: {
+        type: "string",
+        minimum: 0,
+        pattern: "^[0-9]*$",
+        errorMessage: "company sector id should be number"
+      },
+      ...list.properties
+    },
+    required: [...list.required],
+    additinalProperties: false
+  }
 
 
 export const updateJobType = {

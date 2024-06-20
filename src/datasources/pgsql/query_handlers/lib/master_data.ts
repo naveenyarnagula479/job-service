@@ -370,7 +370,7 @@ export async function getJobShiftsByUid(connection: PoolClient, jobShiftUid: str
 export async function checkCategoryIdExist(connection: PoolClient, categoryId: number): Promise<any> {
     logger.info(`${TAG}.checkCategoryIdExist()`);
     try {
-        const query: string = `select * from course_categories where uid= $1 and is_deleted = false`;
+        const query: string = `select * from course_categories where id= $1 and is_deleted = false`;
         const result = await fetchRecord(connection, query, [categoryId]);
         return toCamelCase(result);;
     } catch (error) {

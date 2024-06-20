@@ -13,6 +13,7 @@ export async function validateMasterData(req, res, next) {
 
 export async function updateJobType(req, res, next) {
     logger.info(`${TAG}.updateJobType()`);
+    console.log(masterData.updateJobType)
     const jobTypeUpdates = compile(masterData.updateJobType);
     return await processErrors(req, jobTypeUpdates, next)
 }
@@ -71,9 +72,14 @@ export async function  validateMasterDataWithCategoryId(req, res, next){
     return await processErrors(req, saveMasterDataValidation, next)
 }
 
+export async function getMasterDataWithCategoryId(req,res, next){
+    logger.info(`${TAG}.getMasterDataWithCategoryId()`);
+    const fetchMasterDataValidation = compile(masterData.getMasterDataWithCategoryId);
+    return await processErrors(req, fetchMasterDataValidation, next);
+}
+
 export async function updateSkill(req, res, next){
     logger.info(`${TAG}.updateSkill()`);
-    console.log(masterData.updateSkill);
     const updateSkillValidation = compile(masterData.updateSkill);
     return await processErrors(req, updateSkillValidation, next)
 }

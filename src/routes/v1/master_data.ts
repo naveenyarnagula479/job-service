@@ -35,8 +35,8 @@ router.route(APIPaths.JOB_SHIFTS_BY_UID)
     .get(validation.getJobShiftsByUid,isAdmin, MasterData.getJobShiftsByUid)
 
 router.route(APIPaths.SKILLS)
-    .post(isAdmin, MasterData.saveSkill)
-    .get(isAdmin, MasterData.getSkills)
+    .post(validation.validateMasterDataWithCategoryId,isAdmin, MasterData.saveSkill)
+    .get(validation.getMasterDataWithCategoryId,isAdmin, MasterData.getSkills)
     
 router.route(APIPaths.SKILLS_BY_UID)
     .put(validation.updateSkill,isAdmin, MasterData.updateSkill)
@@ -46,7 +46,7 @@ router.route(APIPaths.SKILLS_BY_UID)
 
 router.route(APIPaths.TOOLS)
     .post(validation.validateMasterDataWithCategoryId,isAdmin, MasterData.saveTool)
-    .get(isAdmin, MasterData.getTools)
+    .get(validation.getMasterDataWithCategoryId,isAdmin, MasterData.getTools)
 
 router.route(APIPaths.TOOLS_BY_UID)
     .put(validation.updateTool,isAdmin, MasterData.updateTool)
@@ -56,7 +56,7 @@ router.route(APIPaths.TOOLS_BY_UID)
 
 router.route(APIPaths.INTERVIEW_ROUNDS)
     .post(validation.validateMasterDataWithCategoryId,isAdmin, MasterData.saveInterviewRound)
-    .get(isAdmin, MasterData.getInterviewRounds)
+    .get(validation.getMasterDataWithCategoryId,isAdmin, MasterData.getInterviewRounds)
 
 router.route(APIPaths.INTERVIEW_ROUNDS_BY_UID)
     .put(validation.updateInterviewRound,isAdmin, MasterData.updateInterviewRound)

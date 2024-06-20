@@ -1,6 +1,6 @@
 
 import { APIError, IAPIError } from './lib/api_error';
-import { BaseListAPIRequest, IBaseListAPIRequest} from './lib/api_requests/base_list_api_request';
+import { BaseListAPIRequest, IBaseListAPIRequest, IMasterDataListAPIRequest, MasterDataListAPIRequest} from './lib/api_requests/base_list_api_request';
 import { IListAPIResponse, ListAPIResponse } from './lib/api_responses/list_api_response';
 import { AppError } from './lib/app_error';
 import { AuditInfo, IAuditInfo } from './lib/audit_info';
@@ -22,6 +22,7 @@ export {
     EmailSender, IAPIError, IAssignments, IAuditInfo, IBaseListAPIRequest, IBaseRecord, IBaseRecordAudit,
     ICourseDetails, IEmailRecipient, IEmailSender, IJwtPayload, ILessonDetails, IListAPIResponse, IModuleDetails, ISectionDetails,
     IServiceResponse, ITestDetails, IUserSession, JwtPayload, ListAPIResponse, SectionDetails, ServiceResponse,
-    UserSession, assignment, courseDetails, lessonDetails, moduleDetails, testDetails, BillingAddress, IBillingAddress, MasterDataDetails, IMasterData
+    UserSession, assignment, courseDetails, lessonDetails, moduleDetails, testDetails, BillingAddress, IBillingAddress, 
+    MasterDataDetails, IMasterData, MasterDataListAPIRequest, IMasterDataListAPIRequest
 };
 

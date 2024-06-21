@@ -17,8 +17,8 @@ export const SKILLS_BY_UID = `${SKILLS}/:skillUid`
 export const TOOLS = '/tool'
 export const TOOLS_BY_UID =  `${TOOLS}/:toolUid`
 
-export const INTERVIEW_ROUNDS = '/interview-round'
-export const INTERVIEW_ROUNDS_BY_UID = `${INTERVIEW_ROUNDS}/:interViewRoundUid`
+export const INTERVIEW_ROUNDS = '/interview-rounds'
+export const INTERVIEW_ROUNDS_BY_UID = `${INTERVIEW_ROUNDS}/:interviewRoundUid`
 
 export const COURSE_CATEGORY = '/course-category'
 export const COURSE_CATEGORY_BY_ID = `${COURSE_CATEGORY}/:categoryUid`

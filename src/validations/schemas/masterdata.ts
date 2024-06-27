@@ -1,7 +1,7 @@
 export const masterDataTypes = {
     type: "object",
     properties: {
-        name: { type: "string", minLength: 1, errorMessage: "name field should not be empty" }
+        name: { type: "string", minLength: 1,pattern: "^[^\\s].*$", errorMessage: "name field should not be empty" }
     },
     required: ["name"],
     additionalProperties: false
@@ -10,8 +10,8 @@ export const masterDataTypes = {
 export const nameWithCategorySchema = {
     type : "object",
     properties: {
-        categoryId: { type : "number", minimum: 1, errorMessage: "category id should not be empty" },
-        name: { type: "string", minLength: 1, errorMessage: "name should not be empty" }
+        categoryId: { type : "number", minimum: 1,  errorMessage: "category id should not be empty" },
+        name: { type: "string", minLength: 1, pattern: "^[^\\s].*$",errorMessage: "name should not be empty" }
     },
     required: ["categoryId", "name"],
     additionalProperties: false
@@ -20,9 +20,9 @@ export const nameWithCategorySchema = {
 export const courseCategory = {
     type: "object",
     properties: {
-        programId: { type: "number", minLength: 1, errorMessage: "program id should not be empty" },
-        name: { type: "string", minLength: 1, errorMessage: "course category name should not be empty" },
-        description: { type: "string", minLength: 1, errorMessage: "description should not be empty" },
+        programId: { type: "number", minLength: 1, pattern: "^[^\\s].*$",errorMessage: "program id should not be empty" },
+        name: { type: "string", minLength: 1,pattern: "^[^\\s].*$", errorMessage: "course category name should not be empty" },
+        description: { type: "string", minLength: 1, pattern: "^[^\\s].*$",errorMessage: "description should not be empty" },
     },
     required: ["programId", "name", "description"],
     additionalProperties: false
@@ -31,7 +31,7 @@ export const courseCategory = {
 export const courseCategoryId = {
     type: "object",
     properties: {
-        categoryId: { type: "string", minLength: 1, errorMessage: "course category id should not be empty" }
+        categoryId: { type: "string", minLength: 1,pattern: "^[^\\s].*$", errorMessage: "course category id should not be empty" }
     },
     required: ["categoryId"],
     additionalProperties: false

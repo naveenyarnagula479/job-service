@@ -4,7 +4,7 @@ import { ITemplates, templates, masterTemplates, IMasterTemplates} from '@models
 export function templateDataMapping(payload: any):ITemplates{
     logger.info('helpers.data_mapping.templates.templateDataMapping()');
     try{
-        if(payload != null && payload! == undefined){
+        if(payload != null && payload !== undefined){
             return new templates(
                 payload.categoryId,
                 payload.jobTitle,
@@ -19,12 +19,11 @@ export function templateDataMapping(payload: any):ITemplates{
                 payload.preferredSkills,
                 payload.aboutCompany,
                 payload.education,
-                payload.jobStartDate,
-                payload.jobEndDate,
                 payload.location,
                 payload.noOfOpenings,
                 payload.salary,
-                payload.experience
+                payload.experience,
+                payload.jobValidUpto
             )
         }
         return payload
@@ -51,12 +50,11 @@ export function masterTemplateDataMapping(payload: any): IMasterTemplates  {
                     payload.preferredSkills,
                     payload.aboutCompany,
                     payload.education,
-                    payload.jobStartDate,
-                    payload.jobEndDate,
                     payload.location,
                     payload.noOfOpenings,
                     payload.salary,
-                    payload.experience
+                    payload.experience,
+                    payload.jobVaildUpto
                 );
             }
             return payload;

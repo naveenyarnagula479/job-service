@@ -25,8 +25,6 @@ export async function addMasterTemplates(payload: IMasterTemplates, userId: numb
             preferred_skills: payload.preferredSkills,
             about_company: payload.aboutCompany,
             education: payload.education,
-            job_start_date: payload.jobStartDate,
-            job_end_date: payload.jobEndDate,
             location: payload.location,
             no_of_openings: payload.noOfOpenings,
             salary: payload.salary,

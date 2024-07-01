@@ -1,6 +1,4 @@
 import mongoose from "mongoose";
-import { json } from "stream/consumers";
-
 
 const modelName = "admin_templates";
 
@@ -54,12 +52,6 @@ const jdTemplateSchema = new mongoose.Schema({
     education: { 
         type: String, 
         required: true },
-    job_start_date: { 
-        type: String, 
-        required: true },
-    job_end_date: { 
-        type: String, 
-        required: true },
     location: { 
         type: String, 
         required: true },
@@ -76,6 +68,10 @@ const jdTemplateSchema = new mongoose.Schema({
         type: Boolean,
         default: false
         },
+    jobValidUpto:{
+        type: Number,
+        required: true
+    },
     created_by: { 
         type: Number, 
         required: true },

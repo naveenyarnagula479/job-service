@@ -52,13 +52,11 @@ export type  IMasterTemplates = IAuditInfo & {
     preferredSkills: string
     aboutCompany: string
     education: string
-    jobStartDate: string
-    jobEndDate: string
     location: string
     noOfOpenings: number
     salary: string
     experience: string
-     
+    jobValidUpto: number
 }
 
 export class masterTemplates extends AuditInfo implements IAuditInfo{
@@ -76,12 +74,11 @@ export class masterTemplates extends AuditInfo implements IAuditInfo{
         public preferredSkills: string
         public aboutCompany: string
         public education: string
-        public jobStartDate: string
-        public jobEndDate: string
         public location: string
         public noOfOpenings: number
         public salary: string
         public experience: string
+        public jobValidUpto: number
         constructor( jobTitle: string,
             description: string,
             tools: ITool[],
@@ -94,12 +91,11 @@ export class masterTemplates extends AuditInfo implements IAuditInfo{
             preferredSkills: string,
             aboutCompany: string,
             education: string,
-            jobStartDate: string,
-            jobEndDate: string,
             location: string,
             noOfOpenings: number,
             salary: string,
             experience: string,
+            jobVaildUpto: number,
             createdBy?: IBaseRecord,
         creationTime?: Date,
         lastUpdatedBy?:IBaseRecord,
@@ -118,11 +114,10 @@ export class masterTemplates extends AuditInfo implements IAuditInfo{
         this.preferredSkills = preferredSkills
         this.aboutCompany = aboutCompany
         this.education = education
-        this.jobStartDate = jobStartDate
-        this.jobEndDate = jobEndDate
         this.location = location
         this.noOfOpenings = noOfOpenings
         this.salary =salary
         this.experience = experience
+        this.jobValidUpto = jobVaildUpto
     }
 }

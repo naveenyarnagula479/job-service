@@ -5,22 +5,30 @@ export const saveMasterTemplate = {
         description: { type:"string", pattern: "^[^\\s].*$", errorMessage: "description should not be empty" },
         tools: { type: "array", "minItems": 1, errorMessage: "tools should not be empty"},
         skills: {type: "array", "minItems": 1,  errorMessage: "sills should not be empty"},
-        employmentType: {type: "array", "minItems": 1,  errorMessage: "employment should not be empty"},
-        jobType:  {type: "array", "minItems": 1,  errorMessage: "job type should not be empty"},
-        shifts: { type: "array", "minItems": 1,  errorMessage: "shifts should not be empty"},
+        employmentType: {type: "object", properties:{
+            id: {type: "number", errorMessage: "id should be number"},
+            name: {type: "string", pattern: "^[^\\s].*$", errorMessage:"name should not be number"}
+        }},
+        jobType:   {type: "object", properties:{
+            id: {type: "number", errorMessage: "id should be number"},
+            name: {type: "string", pattern: "^[^\\s].*$", errorMessage:"name should not be number"}
+        }},
+        shifts:  {type: "object", properties:{
+            id: {type: "number", errorMessage: "id should be number"},
+            name: {type: "string", pattern: "^[^\\s].*$", errorMessage:"name should not be number"}
+        }},
         interview: {type: "array", "minItems": 1,  errorMessage: "interview should not be empty"},
         jobSummary: { type: "string", pattern: "^[^\\s].*$", errorMessage: "job summary should not be empty"},
         preferredSkills: {type: "string", pattern: "^[^\\s].*$", errorMessage: "preferred skills should not be empty"},
         aboutCompany: {type: "string", pattern: "^[^\\s].*$", errorMessage: "about company should not be empty"},
         education: { type: "string", pattern: "^[^\\s].*$", errorMessage: "education should not be empty"},
-        jobStartDate: {  type: "string", format: "date", errorMessage: "Please enter startDate as valid date format (YYYY-MM-DD)"},
-        jobEndDate: { type: "string", format: "date", errorMessage: "Please enter endDate as valid date format (YYYY-MM-DD)"},
         location: {type: "string", pattern: "^[^\\s].*$", errorMessage: "location should not be empty"},
         noOfOpenings: {type: "number", pattern: "^[^\\s].*$", errorMessage: "no of openings should not be empty"},
-        salary: {type: "string", pattern: "^[^\\s].*$", errorMessage: "salary should not be empty"},
-        experience: {type: "string", pattern: "^[^\\s].*$", errorMessage: "experience should not be empty"}
+        salary: {type: "number",  errorMessage: "salary should be number"},
+        experience: {type: "number", errorMessage: "experience should be number"},
+        jobValidUpto: { type: "number", errorMessage: "job valid upto should be number"}
     },
-     required: ["jobTitle", "description", "tools", "skills", "employmentType", "shifts", "interview", "jobSummary", "preferredSkills", "aboutCompany", "education", "jobStartDate", "jobEndDate", "location", "noOfOpenings", "salary", "experience"],
+     required: ["jobTitle", "description", "tools", "skills", "employmentType", "shifts", "interview", "jobSummary", "preferredSkills", "aboutCompany", "education", "location", "noOfOpenings", "salary", "experience", "jobValidUpto"],
      additionalProperties: false
  
 }

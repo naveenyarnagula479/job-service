@@ -8,6 +8,7 @@ import { findOne, findOneAndUpdate, joinTables, findAllRecords } from '../query'
 
 const TAG = 'datasources.mongodb.helpers.lib.jd_templates';
 export async function addJDTemplates(payload: ITemplates, userId: number, programId: number) {
+    console.log("82648214", payload)
         logger.info(TAG + '.addJDTemplates()');
         try {
             const jdTemplates = new JDTemplates({
@@ -26,11 +27,10 @@ export async function addJDTemplates(payload: ITemplates, userId: number, progra
                 preferred_skills: payload.preferredSkills,
                 about_company: payload.aboutCompany,
                 education: payload.education,
-                job_start_date: payload.jobStartDate,
-                job_end_date: payload.jobEndDate,
                 location: payload.location,
                 no_of_openings: payload.noOfOpenings,
                 salary: payload.salary,
+                jobValidUpto: payload.jobValidUpto,
                 experience: payload.experience,
                 created_by: userId,
             

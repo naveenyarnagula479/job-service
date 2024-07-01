@@ -1,8 +1,8 @@
 
-import * as FileData from './lib/file';
+import * as templatesData from './lib/templates';
 import * as MasterData from './lib/master_data'
 export {
-    FileData,
+    templatesData,
    MasterData
 };
 

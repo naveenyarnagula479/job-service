@@ -8,9 +8,9 @@ export const masterDataTypes = {
 }
 
 export const nameWithCategorySchema = {
-    type : "object",
+    type: "object",
     properties: {
-        categoryId: { type : "number", minimum: 1, errorMessage: "category id should not be empty" },
+        categoryId: { type: "number", minimum: 1, errorMessage: "category id should not be empty" },
         name: { type: "string", minLength: 1, errorMessage: "name should not be empty" }
     },
     required: ["categoryId", "name"],
@@ -94,58 +94,63 @@ export const interviewRoundsUid = {
 export const list = {
     type: "object",
     properties: {
-      pageNum: {
-        type: "string",
-        minimum: 0,
-        pattern: "^[0-9]*$",
-        errorMessage: "page number should be number"
-      },
-      pageSize: {
-        type: "string",
-        minimum: 0,
-        pattern: "^[0-9]*$",
-        errorMessage: "page size should be number"
-      },
-      searchText: {
-        type: "string",
-        minLength: 0,
-        maxLength: 10,
-        pattern: "^[\\w\\s]*$",
-        errorMessage: "Search text must be between 2 to 10 characters"
-      },
-      queryId: {
-        type: "number",
-        minimum: 0,
-        errorMessage: "query Id should be number"
-      },
-      sortOrder: {
-        type: "string",
-        enum: ["asc", "desc"],
-        errorMessage: "sort order must be 'asc' or 'desc' "
-      },
-      status : {
-        type : "string"
-      }
+        pageNum: {
+            type: "string",
+            minimum: 0,
+            pattern: "^[0-9]*$",
+            errorMessage: "page number should be number"
+        },
+        pageSize: {
+            type: "string",
+            minimum: 0,
+            pattern: "^[0-9]*$",
+            errorMessage: "page size should be number"
+        },
+        searchText: {
+            type: "string",
+            minLength: 0,
+            maxLength: 10,
+            pattern: "^[\\w\\s]*$",
+            errorMessage: "Search text must be between 2 to 10 characters"
+        },
+        queryId: {
+            type: "number",
+            minimum: 0,
+            errorMessage: "query Id should be number"
+        },
+        sortOrder: {
+            type: "string",
+            enum: ["asc", "desc"],
+            errorMessage: "sort order must be 'asc' or 'desc' "
+        },
+        status: {
+            type: "string"
+        }
     },
     required: [],
     additionalProperties: false
-  }
+}
 
 
-  export const getMasterDataWithCategoryId = {
+export const getMasterData = {
     ...list,
     properties: {
         categoryId: {
-        type: "string",
-        minimum: 0,
-        pattern: "^[0-9]*$",
-        errorMessage: "company sector id should be number"
-      },
-      ...list.properties
+            type: "string",
+            minimum: 0,
+            pattern: "^[0-9]*$",
+            errorMessage: "company sector id should be number"
+        },
+        isPaginated: {
+            type: "string",
+            enum: ["true", "false", ''],
+            errorMessage: "isPaginated should be true or false"
+        },
+        ...list.properties
     },
     required: [...list.required],
     additinalProperties: false
-  }
+}
 
 
 export const updateJobType = {

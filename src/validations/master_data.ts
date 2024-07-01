@@ -72,9 +72,9 @@ export async function  validateMasterDataWithCategoryId(req, res, next){
     return await processErrors(req, saveMasterDataValidation, next)
 }
 
-export async function getMasterDataWithCategoryId(req,res, next){
-    logger.info(`${TAG}.getMasterDataWithCategoryId()`);
-    const fetchMasterDataValidation = compile(masterData.getMasterDataWithCategoryId);
+export async function getMasterData(req,res, next){
+    logger.info(`${TAG}.getMasterData()`);
+    const fetchMasterDataValidation = compile(masterData.getMasterData);
     return await processErrors(req, fetchMasterDataValidation, next);
 }
 

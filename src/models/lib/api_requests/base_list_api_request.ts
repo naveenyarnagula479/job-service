@@ -38,12 +38,14 @@ export class BaseListAPIRequest implements IBaseListAPIRequest {
 
 export interface IMasterDataListAPIRequest extends IBaseListAPIRequest {
   categoryId?: number
+  isPaginated?: boolean
 }
 
 export class MasterDataListAPIRequest
   extends BaseListAPIRequest
   implements IMasterDataListAPIRequest {
   public categoryId?: number
+  public isPaginated?: boolean
 
   constructor(
     searchText: string,
@@ -52,10 +54,12 @@ export class MasterDataListAPIRequest
     queryId?: string,
     sortBy?: string,
     sortOrder?: string,
-    categoryId?: number
+    categoryId?: number,
+    isPaginated?: boolean
   ) {
     super(searchText, pageNum, pageSize, queryId, sortBy, sortOrder)
 
     this.categoryId = categoryId
+    this.isPaginated = isPaginated
   }
 }

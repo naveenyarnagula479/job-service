@@ -141,8 +141,8 @@ export async function deleteJobType(connection: PoolClient, jobTypeUid: string, 
     }
 }
 
-export async function getJobTypes(connection: PoolClient, queryParams: any): Promise<any> {
-    logger.info(`${TAG}.getJobTypes()`);
+export async function getJobTypesWithPagination(connection: PoolClient, queryParams: any): Promise<any> {
+    logger.info(`${TAG}.getJobTypesWithPagination()`);
     try {
         let listQuery: string = `select * from job_types where is_deleted = false  `;
         let countQuery: string = `select count(*) from job_types where is_deleted = false `;
@@ -151,19 +151,21 @@ export async function getJobTypes(connection: PoolClient, queryParams: any): Pro
             where += ` and name ilike '%${queryParams.searchText}%' `
         }
         countQuery = countQuery + where;
-        where += ` order by id `
-        if (typeof queryParams.pageSize !== 'undefined') {
-            where += ` LIMIT ${queryParams.pageSize} `
-        }
-        if (typeof queryParams.pageNum !== 'undefined') {
-            where += ` OFFSET ${(queryParams.pageNum - 1) * queryParams.pageSize}`
+        where += ` order by id desc `
+        if (queryParams.isPaginated) {
+            if (typeof queryParams.pageSize !== 'undefined') {
+                where += ` LIMIT ${queryParams.pageSize} `
+            }
+            if (typeof queryParams.pageNum !== 'undefined') {
+                where += ` OFFSET ${(queryParams.pageNum - 1) * queryParams.pageSize}`
+            }
         }
         let finalQuery = listQuery + where;
         const list = toCamelCase(await fetchRecords(connection, finalQuery, []));
         const totalResultsCount = await fetchRecord(connection, countQuery, []);
         return { list, totalResultsCount };
     } catch (error) {
-        logger.error(`Error occurred in ${TAG}.getJobTypes()`, error);
+        logger.error(`Error occurred in ${TAG}.getJobTypesWithPagination()`, error);
         throw error;
     }
 }
@@ -233,8 +235,8 @@ export async function deleteEmploymentType(connection: PoolClient, employmentTyp
 
 }
 
-export async function getEmploymentTypes(connection: PoolClient, userSession: IUserSession, queryParams: any): Promise<any> {
-    logger.info(`${TAG}.getEmploymentTypes()`);
+export async function getEmploymentTypesWithPagination(connection: PoolClient, userSession: IUserSession, queryParams: any): Promise<any> {
+    logger.info(`${TAG}.getEmploymentTypesWithPagination()`);
     try {
         let listQuery: string = `select * from employment_types where is_deleted = false  `;
         let countQuery: string = `select count(*) from employment_types where is_deleted = false `;
@@ -243,19 +245,21 @@ export async function getEmploymentTypes(connection: PoolClient, userSession: IU
             where += ` and name ilike '%${queryParams.searchText}%' `
         }
         countQuery = countQuery + where;
-        where += ` order by id `
-        if (typeof queryParams.pageSize !== 'undefined') {
-            where += ` LIMIT ${queryParams.pageSize} `
-        }
-        if (typeof queryParams.pageNum !== 'undefined') {
-            where += ` OFFSET ${(queryParams.pageNum - 1) * queryParams.pageSize}`
+        where += ` order by id desc `
+        if (queryParams.isPaginated) {
+            if (typeof queryParams.pageSize !== 'undefined') {
+                where += ` LIMIT ${queryParams.pageSize} `
+            }
+            if (typeof queryParams.pageNum !== 'undefined') {
+                where += ` OFFSET ${(queryParams.pageNum - 1) * queryParams.pageSize}`
+            }
         }
         let finalQuery = listQuery + where;
         const list = toCamelCase(await fetchRecords(connection, finalQuery, []));
         const totalResultsCount = await fetchRecord(connection, countQuery, []);
         return { list, totalResultsCount };
     } catch (error) {
-        logger.error(`Error occured in ${TAG}.getEmploymentTypes()`, error);
+        logger.error(`Error occured in ${TAG}.getEmploymentTypesWithPagination()`, error);
         throw error
     }
 }
@@ -327,8 +331,8 @@ export async function deleteJobShifts(connection: PoolClient, jobShiftUid: strin
 
 }
 
-export async function getJobShifts(connection: PoolClient, userSession: IUserSession, queryParams: any): Promise<any> {
-    logger.info(`${TAG}.getJobShifts()`);
+export async function getJobShiftsWithPagination(connection: PoolClient, userSession: IUserSession, queryParams: any): Promise<any> {
+    logger.info(`${TAG}.getJobShiftsWithPagination()`);
     try {
         let listQuery: string = `select * from job_shifts where is_deleted = false `;
         let countQuery: string = `select count(*) from job_shifts where is_deleted = false `;
@@ -337,19 +341,21 @@ export async function getJobShifts(connection: PoolClient, userSession: IUserSes
             where += ` and name ilike '%${queryParams.searchText}%' `
         }
         countQuery = countQuery + where;
-        where += ` order by id `
-        if (typeof queryParams.pageSize !== 'undefined') {
-            where += ` LIMIT ${queryParams.pageSize} `
-        }
-        if (typeof queryParams.pageNum !== 'undefined') {
-            where += ` OFFSET ${(queryParams.pageNum - 1) * queryParams.pageSize}`
+        where += ` order by id desc `
+        if (queryParams.isPaginated) {
+            if (typeof queryParams.pageSize !== 'undefined') {
+                where += ` LIMIT ${queryParams.pageSize} `
+            }
+            if (typeof queryParams.pageNum !== 'undefined') {
+                where += ` OFFSET ${(queryParams.pageNum - 1) * queryParams.pageSize}`
+            }
         }
         let finalQuery = listQuery + where;
         const list = toCamelCase(await fetchRecords(connection, finalQuery, []));
         const totalResultsCount = await fetchRecord(connection, countQuery, []);
         return { list, totalResultsCount };
     } catch (error) {
-        logger.error(`Error occured in ${TAG}.getJobShifts()`, error);
+        logger.error(`Error occured in ${TAG}.getJobShiftsWithPagination()`, error);
         throw error
     }
 }
@@ -555,10 +561,10 @@ export async function deleteSkill(connection: PoolClient, skillUid: string, user
     }
 }
 
-export async function getSkills(connection: PoolClient, queryParams: any): Promise<any> {
-    logger.info(`${TAG}.getSkills() `);
+export async function getSkillsWithPagination(connection: PoolClient, queryParams: any): Promise<any> {
+    logger.info(`${TAG}.getSkillsWithPagination() `);
     try {
-        let listQuery: string = `select s.name, s.uid, cc.id as category_id, cc.category_name, s.is_deleted, s.created_by, s.created_by_name,
+        let listQuery: string = `select s.id, s.name, s.uid, cc.id as category_id, cc.category_name, s.is_deleted, s.created_by, s.created_by_name,
          s.created_at, s.updated_by, s.updated_at, s.updated_by_name from skills s join course_categories cc on 
          s.course_category_id = cc.id `
         let countQuery: string = `select count(s.*) from skills s join course_categories cc on 
@@ -574,7 +580,7 @@ export async function getSkills(connection: PoolClient, queryParams: any): Promi
             where += ` and (s.name ilike '%${queryParams.searchText}%' or cc.category_name ilike '%${queryParams.searchText}%') `
         }
         countQuery = countQuery + where;
-        where += ` order by s.id `
+        where += ` order by s.id desc `
         if (typeof queryParams.pageSize !== 'undefined') {
             where += ` LIMIT ${queryParams.pageSize} `
         }
@@ -586,7 +592,7 @@ export async function getSkills(connection: PoolClient, queryParams: any): Promi
         const totalResultsCount = await fetchRecord(connection, countQuery, []);
         return { list, totalResultsCount };
     } catch (error) {
-        logger.error(`ERROR occurred in ${TAG}.getSkills() `, error);
+        logger.error(`ERROR occurred in ${TAG}.getSkillsWithPagination() `, error);
         throw error;
     }
 }
@@ -663,10 +669,10 @@ export async function deleteTool(connection: PoolClient, toolUid: string, userSe
     }
 }
 
-export async function getTools(connection: PoolClient, queryParams: any, userSession: IUserSession): Promise<any> {
-    logger.info(`${TAG}.getTools() `);
+export async function getToolsWithPagination(connection: PoolClient, queryParams: any, userSession: IUserSession): Promise<any> {
+    logger.info(`${TAG}.getToolsWithPagination() `);
     try {
-        let listQuery: string = `select t.name, t.uid, cc.id as category_id, cc.category_name, t.is_deleted, t.created_by, t.created_by_name,
+        let listQuery: string = `select t.id, t.name, t.uid, cc.id as category_id, cc.category_name, t.is_deleted, t.created_by, t.created_by_name,
          t.created_at, t.updated_by, t.updated_at, t.updated_by_name from tools t join course_categories cc on
           t.course_category_id = cc.id `
         let countQuery: string = `select count(t.*) from tools t join course_categories cc on
@@ -682,19 +688,22 @@ export async function getTools(connection: PoolClient, queryParams: any, userSes
             where += ` and (t.name ilike '%${queryParams.searchText}%' or cc.category_name ilike '%${queryParams.searchText}%') `
         }
         countQuery = countQuery + where;
-        where += ` order by t.id `
-        if (typeof queryParams.pageSize !== 'undefined') {
-            where += ` LIMIT ${queryParams.pageSize} `
-        }
-        if (typeof queryParams.pageNum !== 'undefined') {
-            where += ` OFFSET ${(queryParams.pageNum - 1) * queryParams.pageSize}`
+        where += ` order by t.id desc `
+        if (queryParams.isPaginated) {
+
+            if (typeof queryParams.pageSize !== 'undefined') {
+                where += ` LIMIT ${queryParams.pageSize} `
+            }
+            if (typeof queryParams.pageNum !== 'undefined') {
+                where += ` OFFSET ${(queryParams.pageNum - 1) * queryParams.pageSize}`
+            }
         }
         let finalQuery = listQuery + where;
         const list = toCamelCase(await fetchRecords(connection, finalQuery, []));
         const totalResultsCount = await fetchRecord(connection, countQuery, []);
         return { list, totalResultsCount };
     } catch (error) {
-        logger.error(`ERROR occurred in ${TAG}.getTools() `, error);
+        logger.error(`ERROR occurred in ${TAG}.getToolsWithPagination() `, error);
         throw error;
     }
 }
@@ -769,10 +778,10 @@ export async function deleteInterviewRound(connection: PoolClient, interViewRoun
     }
 }
 
-export async function getInterviewRounds(connection: PoolClient, queryParams: any, userSession: IUserSession): Promise<any> {
-    logger.info(`${TAG}.getInterviewRounds() `);
+export async function getInterviewRoundsWithPagination(connection: PoolClient, queryParams: any, userSession: IUserSession): Promise<any> {
+    logger.info(`${TAG}.getInterviewRoundsWithPagination() `);
     try {
-        let listQuery: string = `select ir.name, ir.uid, cc.id as category_id, cc.category_name, ir.is_deleted, ir.created_by, 
+        let listQuery: string = `select ir.id, ir.name, ir.uid, cc.id as category_id, cc.category_name, ir.is_deleted, ir.created_by, 
         ir.created_by_name, ir.created_at, ir.updated_by, ir.updated_at, ir.updated_by_name from interview_rounds ir
          join course_categories cc on ir.course_category_id = cc.id `
         let countQuery: string = `select count(*) from interview_rounds ir
@@ -788,19 +797,21 @@ export async function getInterviewRounds(connection: PoolClient, queryParams: an
             where += ` and (ir.name ilike '%${queryParams.searchText}%' or cc.category_name ilike '%${queryParams.searchText}%') `
         }
         countQuery = countQuery + where;
-        where += ` order by ir.id `
-        if (typeof queryParams.pageSize !== 'undefined') {
-            where += ` LIMIT ${queryParams.pageSize} `
-        }
-        if (typeof queryParams.pageNum !== 'undefined') {
-            where += ` OFFSET ${(queryParams.pageNum - 1) * queryParams.pageSize}`
+        where += ` order by ir.id desc `
+        if (queryParams.isPaginated) {
+            if (typeof queryParams.pageSize !== 'undefined') {
+                where += ` LIMIT ${queryParams.pageSize} `
+            }
+            if (typeof queryParams.pageNum !== 'undefined') {
+                where += ` OFFSET ${(queryParams.pageNum - 1) * queryParams.pageSize}`
+            }
         }
         let finalQuery = listQuery + where;
         const list = toCamelCase(await fetchRecords(connection, finalQuery, []));
         const totalResultsCount = await fetchRecord(connection, countQuery, []);
         return { list, totalResultsCount };
     } catch (error) {
-        logger.error(`ERROR occurred in ${TAG}.getInterviewRounds() `, error);
+        logger.error(`ERROR occurred in ${TAG}.getInterviewRoundsWithPagination() `, error);
         throw error;
     }
 }
@@ -898,6 +909,18 @@ export async function getCourseCategoriesByUid(connection: PoolClient, categoryU
         return toCamelCase(result);
     } catch (error) {
         logger.error(`ERROR occurred in ${TAG}.getCourseCategoriesByUid()`, error);
+        throw error;
+    }
+}
+
+export async function getTools(connection: PoolClient, categoryId?: number): Promise<any> {
+    logger.info(`${TAG}.getTools() `);
+    try {
+        const query: string = `SELECT ID, NAME FROM TOOLS WHERE COURSE_CATEGORY_ID = $1`;
+        const result = await fetchRecords(connection, query, [categoryId]);
+        return toCamelCase(result);
+    } catch (error) {
+        logger.error(`ERROR occured in ${TAG}.getTools() `, error);
         throw error;
     }
 }

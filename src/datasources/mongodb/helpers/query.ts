@@ -114,3 +114,13 @@ export async function joinTables(model: any, pipeLine: any) {
         logger.error(`ERROR occurred in ${TAG}.joinTables() `, error);
     }
 }
+
+
+export async function countDocuments(model: any, options: any) {
+    logger.info(TAG + 'countDocuments() ');
+    try {
+        return await model.countDocuments(options);
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.countDocuments) `, error);
+    }
+}

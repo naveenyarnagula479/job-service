@@ -59,6 +59,11 @@ export const MONGO_DATABASE = {
     name: process.env.MONGO_DATABASE_NAME || 'lms',
 };
 
+export const AUTH_SERVICE_CONF = {
+    baseUrl: process.env.AUTH_SERVICE_BASE_URL,
+    recruiter: process.env.RECRUITERS
+}
+
 export async function checkEnv() {
     logger.info('STARTED Validation of env variables!');
     const mandatoryFields = ['SQL_DATABASE_HOST', 'SQL_DATABASE_USERNAME', 'SQL_DATABASE_PASSWORD'];

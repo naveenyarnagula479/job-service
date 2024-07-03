@@ -54,11 +54,17 @@ export const EXAM_STATUS = {
 
 export const JOB_STATUS = {
     drafted: 'DRAFTED',
-    request: 'REQUEST',
+    newRequest: 'NEW_REQUEST',
     reRequest: 'RE_REQUEST',
     onHold: 'ON_HOLD',
     active: 'ACTIVE',
     inActive: 'INACTIVE',
     pending: 'PENDING',
     expired: 'EXPIRED'
+}
+
+export const STUDENT_JOB_TYPE = {
+    all: 'ALL',
+    appliedJobs: 'APPLIED_JOBS',
+    savedJobs: 'SAVED_JOBS'
 }

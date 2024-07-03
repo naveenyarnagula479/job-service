@@ -7,15 +7,21 @@ const router = Router();
 
 router.route(APIPaths.JOBS)
     .post(isUser([USER_ROLES.recruiter]), controller.saveJobDeatils)
-    .get(isUser([USER_ROLES.recruiter, USER_ROLES.admin]), controller.getJobDetails);
+    .get(isUser([USER_ROLES.recruiter, USER_ROLES.admin, USER_ROLES.student]), controller.getJobDetails);
 
 router.route(APIPaths.JOBS_BY_UID)
     .put(isUser([USER_ROLES.recruiter]), controller.updateJobsByUid)
-    .get(isUser([USER_ROLES.recruiter]), controller.getJobsByUid)
+    .get(isUser([USER_ROLES.recruiter, USER_ROLES.admin]), controller.getJobsByUid)
     .delete(isUser([USER_ROLES.recruiter]), controller.deleteJobsByUid)
     .patch(isUser([USER_ROLES.recruiter]), controller.submitRecruiterRequest);
 
 router.route(APIPaths.JOBS_STATUS)
     .patch(isAdmin, controller.updateJobStatus);
+
+router.route(APIPaths.APPLY_JOB)
+    .post(isUser([USER_ROLES.student]), controller.applyStudentJob);
+
+router.route(APIPaths.SAVE_JOB)
+    .post(isUser([USER_ROLES.student]), controller.toggleSaveJobStatus);
 
 export default router;

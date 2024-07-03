@@ -102,8 +102,15 @@ export function requestJobsListQueryMapping(query: any): IJobsListAPIRequest {
             query?.pageNum,
             query?.pageSize,
             query?.categoryId,
-            query?.isActionableJobs
-
+            query?.isActionableJobs,
+            query?.location,
+            query?.jobTypeIds,
+            query?.employmentTypeIds,
+            query?.salaryFrom,
+            query?.salaryTo,
+            query?.experienceFrom,
+            query?.experienceTo,
+            query?.type || 'ALL'
         )
     } catch (error) {
         logger.error(`ERROR occurred in helpers.data_mapping.request_query.requestJobsListQueryMapping() `);

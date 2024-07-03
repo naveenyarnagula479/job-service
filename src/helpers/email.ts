@@ -1,26 +1,42 @@
-import {emailClientLoader} from '@loaders/email_client';
-import log from '@logger';
-import {IEmailRecipient, IEmailSender} from '@models';
 
-const TAG = 'helpers.email';
+import { AWS_S3, SENDER_EMAIL_ID } from "@config";
+import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses";
 
-export async function sendEmail(emailSender: IEmailSender, emailRecipient: IEmailRecipient, subject: string,
-                                body: string, attachments?: any[]) {
-    log.info(`${TAG}.sendEmail()`);
+// Configure AWS credentials and SES region
+const sesClient = new SESClient({
+    region: AWS_S3.region,
+    credentials: {
+        accessKeyId: AWS_S3.accessKeyId,
+        secretAccessKey: AWS_S3.secretAccessKey
+    }
+});
+
+// Function to send email
+export async function sendEmail(recipient, subject, body) {
+    const params = {
+        Destination: {
+            ToAddresses: [recipient]
+        },
+        Message: {
+            Body: {
+                Html: {
+                    Charset: 'UTF-8',
+                    Data: body
+                }
+            },
+            Subject: {
+                Charset: 'UTF-8',
+                Data: subject
+            }
+        },
+        Source: SENDER_EMAIL_ID
+    };
+
     try {
-        const emailClient = emailClientLoader();
-        return await emailClient.sendMail({
-            from: emailSender.emailId,
-            to: emailRecipient.toEmailIds,
-            cc: emailRecipient?.ccEmailIds ?? [],
-            bcc: emailRecipient?.bccEmailIds ?? [],
-            subject: subject,
-            html: body,
-            attachments: attachments,
-        });
-    } catch (error) {
-        log.error(`ERROR occurred in ${TAG}.sendEmail()`, error);
-        throw error;
+        const command = new SendEmailCommand(params);
+        const data = await sesClient.send(command);
+        console.log('Email sent successfully:', data.MessageId);
+    } catch (err) {
+        console.error('Error sending email:', err);
     }
 }
-

@@ -1,14 +1,4 @@
 export const ROUTER_DUMMY = '/dummy';
-export const ROUTER_TEMPLATES = `/`;
-export const ROUTER_JOBS = '/';
-
-export const MASTER_TEMPLATES = '/master-templates';
-export const TEMPLATES = '/templates';
-export const TEMPLATE_BY_UID =`${TEMPLATES}/:templateUid`;
-
-export const JOBS ='/jobs';
-export const JOBS_BY_UID = `${JOBS}/:jobUid`;
-export const JOBS_STATUS = `${JOBS_BY_UID}/status`
 export const MASTER_DATA = '/master-data'
 
 //paths related to configurational data
@@ -28,7 +18,19 @@ export const TOOLS = '/tool'
 export const TOOLS_BY_UID =  `${TOOLS}/:toolUid`
 
 export const INTERVIEW_ROUNDS = '/interview-round'
-export const INTERVIEW_ROUNDS_BY_UID = `${INTERVIEW_ROUNDS}/:interViewRoundUid`
+export const INTERVIEW_ROUNDS_BY_UID = `${INTERVIEW_ROUNDS}/:interviewRoundUid`
 
 export const COURSE_CATEGORY = '/course-category'
 export const COURSE_CATEGORY_BY_ID = `${COURSE_CATEGORY}/:categoryUid`
+
+export const ROUTER_TEMPLATES = `/`;
+export const ROUTER_JOBS = '/';
+
+export const 
+MASTER_TEMPLATES = '/master-template';
+export const TEMPLATES = '/template';
+export const TEMPLATE_BY_UID =`${TEMPLATES}/:templateUid`;
+
+export const JOBS ='/jobs';
+export const JOBS_BY_UID = `${JOBS}/:jobUid`;
+export const JOBS_STATUS = `${JOBS_BY_UID}/status`

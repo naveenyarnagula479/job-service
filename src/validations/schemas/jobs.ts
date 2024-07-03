@@ -1,29 +1,108 @@
 export const saveJobs = {
     type: "object",
     properties: {
-        categoryId: {type: "number", errorMessage: "category Id should be number"},
-        programId: {type: "number", errorMessage: "program Id should be number"},
         templateUid: {type: "string", errorMessage: "template Uid should not be empty"},
-        jobTitle:{type:"string", pattern: "^[^\\s].*$", errorMessage: "job title should not be empty" },
         description: { type:"string", pattern: "^[^\\s].*$", errorMessage: "description should not be empty" },
-        tools: { type: "array", "minItems": 1, errorMessage: "tools should not be empty"},
-        skills: {type: "array", "minItems": 1,  errorMessage: "sills should not be empty"},
-        employmentType: {type: "array", "minItems": 1,  errorMessage: "employment should not be empty"},
-        jobType:  {type: "array", "minItems": 1,  errorMessage: "job type should not be empty"},
-        shifts: { type: "array", "minItems": 1,  errorMessage: "shifts should not be empty"},
-        interview: {type: "array", "minItems": 1,  errorMessage: "interview should not be empty"},
+        tools: { 
+            type: "array", 
+            minItems: 1, 
+            items: {
+                type: "object",
+                properties: {
+                    id: { type: "number", minimum: 0, errorMessage: "tool id should be a number" },
+                    name: { type: "string", pattern: "^[^\\s].*$", errorMessage: "tool name should not be empty" }
+                },
+                required: ["id", "name"],
+                additionalProperties: false,
+                errorMessage: {
+                    required: {
+                        id: "tool id should be provided",
+                        name: "tool name should not be empty"
+                    }
+                }
+            },
+            errorMessage: {
+                minItems: "tools should not be empty",
+                type: "tools should be an array of objects"
+            }
+        },
+        skills: { 
+            type: "array", 
+            minItems: 1, 
+            items: {
+                type: "object",
+                properties: {
+                    id: { type: "number", minimum: 0, errorMessage: "skill id should be a number" },
+                    name: { type: "string", pattern: "^[^\\s].*$", errorMessage: "skill name should not be empty" }
+                },
+                required: ["id", "name"],
+                additionalProperties: false,
+                errorMessage: {
+                    required: {
+                        id: "skill id should be provided",
+                        name: "skill name should not be empty"
+                    }
+                }
+            },
+            errorMessage: {
+                minItems: "skills should not be empty",
+                type: "skills should be an array of objects"
+            }
+        },
+        employmentType: {type: "object", properties:{
+            id: {type: "number", errorMessage: "id should be number"},
+            name: {type: "string", pattern: "^[^\\s].*$", errorMessage:"name should not be number"}
+        },
+        required:["id","name"],
+        additionalProperties: false},
+        jobType:  {type: "object", properties:{
+            id: {type: "number", errorMessage: "id should be number"},
+            name: {type: "string", pattern: "^[^\\s].*$", errorMessage:"name should not be number"}
+        },
+        required:["id","name"],
+        additionalProperties: false},
+        shifts:  {type: "object", properties:{
+            id: {type: "number", errorMessage: "id should be number"},
+            name: {type: "string", pattern: "^[^\\s].*$", errorMessage:"name should not be number"}
+        },
+        required:["id","name"],
+        additionalProperties: false},
+        interview: { 
+            type: "array", 
+            minItems: 1, 
+            items: {
+                type: "object",
+                properties: {
+                    id: { type: "number", errorMessage: "interview id should be a number" },
+                    name: { type: "string", pattern: "^[^\\s].*$", errorMessage: "interview name should not be empty" }
+                },
+                required: ["id", "name"],
+                additionalProperties: false,
+                errorMessage: {
+                    required: {
+                        id: "interview id should be provided",
+                        name: "interview name should not be empty"
+                    }
+                }
+            },
+            errorMessage: {
+                minItems: "interview should not be empty",
+                type: "interview should be an array of objects"
+            }
+        },
         jobSummary: { type: "string", pattern: "^[^\\s].*$", errorMessage: "job summary should not be empty"},
         preferredSkills: {type: "string", pattern: "^[^\\s].*$", errorMessage: "preferred skills should not be empty"},
         aboutCompany: {type: "string", pattern: "^[^\\s].*$", errorMessage: "about company should not be empty"},
         education: { type: "string", pattern: "^[^\\s].*$", errorMessage: "education should not be empty"},
-        jobStartDate: {  type: "string", format: "date", errorMessage: "Please enter startDate as valid date format (YYYY-MM-DD)"},
-        jobEndDate: { type: "string", format: "date", errorMessage: "Please enter endDate as valid date format (YYYY-MM-DD)"},
         location: {type: "string", pattern: "^[^\\s].*$", errorMessage: "location should not be empty"},
-        noOfOpenings: {type: "number", minimum: 1, pattern: "^[^\\s].*$", errorMessage: "no of openings should not be empty"},
-        salary: {type: "string", pattern: "^[^\\s].*$", errorMessage: "salary should not be empty"},
-        experience: {type: "string", pattern: "^[^\\s].*$", errorMessage: "experience should not be empty"}
+        noOfOpenings: {type: "number", minimum: 0, errorMessage: "no of openings should not be empty"},
+        salary: {type: "number",  minimum: 0, errorMessage: "salary should be number"},
+        experience: {type: "number", minimum: 0, errorMessage: "experience should be number"},
+        jobValidUpto: { type: "number", minimum: 0, errorMessage: "job valid upto should be number"},
+        requirements: {type: "string", pattern: "^[^\\s].*$", errorMessage:"requirements should not be empty"}
+
     },
-     required: ["jobTitle", "description", "tools", "skills", "employmentType", "shifts", "interview", "jobSummary", "preferredSkills", "aboutCompany", "education", "jobStartDate", "jobEndDate", "location", "noOfOpenings", "salary", "experience"],
+     required: [ "description", "tools", "skills", "employmentType", "shifts", "interview", "jobSummary", "preferredSkills", "aboutCompany", "education", "location", "noOfOpenings", "salary", "experience", "requirements"],
      additionalProperties: false
  
 }
@@ -49,22 +128,13 @@ export const getJobs = {
             pattern: "^[\\w\\s]*$",
             errorMessage: "Search text must be between 2 to 10 characters"
         },
-        categoryId: {
-            type: "number",
-            minimum: 0,
-            errorMessage: "category id  should be number"
-        },
-        programId: {
-            type: "number",
-            minimum: 0,
-            errorMessage: "program id  should be number"
-        },
-        templateUid: {
+        isActionableJobs: {
             type: "string",
-            pattern: "^[^\\s].*$", errorMessage: "template uid should not be empty"
+            enum: ["true","false"],
+            errorMessage: "is actionable job should be true or false"
         }
     },
-    required: ["categoryId", "programId", "templateUid" ],
+    required: [],
     additionalProperties: false
 }
 export const jobUid= {

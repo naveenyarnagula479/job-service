@@ -37,7 +37,7 @@ interface IInterview {
     createdBy: string;
 }
 
-export type  IMasterTemplates = IAuditInfo & {
+export type IMasterTemplates = IAuditInfo & {
     id: number
     uid: string
     jobTitle: string
@@ -48,60 +48,67 @@ export type  IMasterTemplates = IAuditInfo & {
     jobType: IJobType[]
     shifts: IShift[]
     interview: IInterview[]
+    requirements: string
     jobSummary: string
     preferredSkills: string
     aboutCompany: string
     education: string
+    jobValidUpto: number
     location: string
     noOfOpenings: number
-    salary: string
-    experience: string
-    jobValidUpto: number
+    salary: number
+    salaryType: string
+    experience: number
+
 }
 
-export class masterTemplates extends AuditInfo implements IAuditInfo{
-        public id: number
-        public uid: string
-        public jobTitle: string
-        public description: string
-        public tools: ITool[]
-        public skills: ISkill[]
-        public employmentType: IEmploymentType[]
-        public jobType: IJobType[]
-        public shifts: IShift[]
-        public interview: IInterview[]
-        public jobSummary: string
-        public preferredSkills: string
-        public aboutCompany: string
-        public education: string
-        public location: string
-        public noOfOpenings: number
-        public salary: string
-        public experience: string
-        public jobValidUpto: number
-        constructor( jobTitle: string,
-            description: string,
-            tools: ITool[],
-            skills: ISkill[],
-            employmentType: IEmploymentType[],
-            jobType: IJobType[],
-            shifts: IShift[],
-            interview: IInterview[],
-            jobSummary: string,
-            preferredSkills: string,
-            aboutCompany: string,
-            education: string,
-            location: string,
-            noOfOpenings: number,
-            salary: string,
-            experience: string,
-            jobVaildUpto: number,
-            createdBy?: IBaseRecord,
+export class masterTemplates extends AuditInfo implements IAuditInfo {
+    public id: number
+    public uid: string
+    public jobTitle: string
+    public description: string
+    public tools: ITool[]
+    public skills: ISkill[]
+    public employmentType: IEmploymentType[]
+    public jobType: IJobType[]
+    public shifts: IShift[]
+    public interview: IInterview[]
+    public requirements: string
+    public jobSummary: string
+    public preferredSkills: string
+    public aboutCompany: string
+    public education: string
+    public jobValidUpto: number
+    public location: string
+    public noOfOpenings: number
+    public salary: number
+    public salaryType: string
+    public experience: number
+    constructor(jobTitle: string,
+        description: string,
+        tools: ITool[],
+        skills: ISkill[],
+        employmentType: IEmploymentType[],
+        jobType: IJobType[],
+        shifts: IShift[],
+        interview: IInterview[],
+        requirements: string,
+        jobSummary: string,
+        preferredSkills: string,
+        aboutCompany: string,
+        education: string,
+        jobValidUpto: number,
+        location: string,
+        noOfOpenings: number,
+        salary: number,
+        salaryType: string,
+        experience: number,
+        createdBy?: IBaseRecord,
         creationTime?: Date,
-        lastUpdatedBy?:IBaseRecord,
-        lastUpdatedTime?: Date 
+        lastUpdatedBy?: IBaseRecord,
+        lastUpdatedTime?: Date
     ) {
-        super(createdBy,creationTime,lastUpdatedBy, lastUpdatedTime);
+        super(createdBy, creationTime, lastUpdatedBy, lastUpdatedTime);
         this.jobTitle = jobTitle
         this.description = description
         this.tools = tools
@@ -110,14 +117,16 @@ export class masterTemplates extends AuditInfo implements IAuditInfo{
         this.jobType = jobType
         this.shifts = shifts
         this.interview = interview
+        this.requirements = requirements
         this.jobSummary = jobSummary
         this.preferredSkills = preferredSkills
         this.aboutCompany = aboutCompany
         this.education = education
         this.location = location
         this.noOfOpenings = noOfOpenings
-        this.salary =salary
+        this.salary = salary
+        this.salaryType = salaryType
         this.experience = experience
-        this.jobValidUpto = jobVaildUpto
+        this.jobValidUpto = jobValidUpto
     }
 }

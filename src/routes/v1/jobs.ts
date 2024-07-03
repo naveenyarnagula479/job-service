@@ -7,12 +7,15 @@ import * as validation from '@validations';
 const router = Router();
 
 router.route(APIPaths.JOBS)
-    .post(validation.saveJobs,isUser([USER_ROLES.recruiter]),controller.saveJobDeatils)
-    .get(validation.getJobs, isUser([USER_ROLES.recruiter]),controller.getJobDetails);
+    .post(validation.saveJobs,isUser([USER_ROLES.recruiter]), controller.saveJobDeatils)
+    .get(validation.getJobs,isUser([USER_ROLES.recruiter, USER_ROLES.admin]), controller.getJobDetails);
+
 router.route(APIPaths.JOBS_BY_UID)
-    .put(validation.updateJob,isUser([USER_ROLES.recruiter]),controller.updateJobsByUid)
-    .get(validation.jobUid,isUser([USER_ROLES.recruiter]),controller.getJobsByUid)
-    .delete(validation.jobUid,isUser([USER_ROLES.recruiter]),controller.deleteJobsByUid);
+    .put(validation.updateJob,isUser([USER_ROLES.recruiter]), controller.updateJobsByUid)
+    .get(isUser([USER_ROLES.recruiter]), controller.getJobsByUid)
+    .delete(isUser([USER_ROLES.recruiter]), controller.deleteJobsByUid)
+    .patch(isUser([USER_ROLES.recruiter]), controller.submitRecruiterRequest);
+
 router.route(APIPaths.JOBS_STATUS)
     .patch(isAdmin, controller.updateJobStatus);
 

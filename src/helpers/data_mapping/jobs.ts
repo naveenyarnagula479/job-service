@@ -1,15 +1,12 @@
 import logger from '@logger';
-import { IJobs, jobs} from '@models';
+import { IJobs, jobs } from '@models';
 
-export function jobsDataMapping(payload: any):IJobs{
+export function jobsDataMapping(payload: any): IJobs {
     logger.info('helpers.data_mapping.jobs.jobsDataMapping()');
-    try{
-        if(payload != null && payload! == undefined){
+    try {
+        if (payload != null && payload !== undefined) {
             return new jobs(
                 payload.templateUid,
-                payload.categoryId,
-                payload.programId,
-                payload.jobTitle,
                 payload.description,
                 payload.tools,
                 payload.skills,
@@ -17,20 +14,21 @@ export function jobsDataMapping(payload: any):IJobs{
                 payload.jobType,
                 payload.shifts,
                 payload.interview,
+                payload.requirements,
                 payload.jobSummary,
                 payload.preferredSkills,
                 payload.aboutCompany,
                 payload.education,
-                payload.jobStartDate,
-                payload.jobEndDate,
+                payload.jobValidUpto,
                 payload.location,
                 payload.noOfOpenings,
                 payload.salary,
+                payload.salaryType || "LPA",
                 payload.experience
             )
         }
         return payload
-    }catch(error){
+    } catch (error) {
         logger.error('ERROR occured in helpers.data_mapping.jobs.jobsDataMapping()')
         throw error;
     }

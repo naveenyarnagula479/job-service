@@ -1,9 +1,9 @@
 
 import { HttpStatusCodes } from "@constants/status_codes";
-import { commitTransaction, getConnection, releaseConnection, rollBackTransaction } from "@db/helpers/transaction";
+import { getConnection, releaseConnection } from "@db/helpers/transaction";
 import { MasterData } from "@db/queries";
 import logger from "@logger";
-import { IBaseListAPIRequest, IListAPIResponse, IMasterData, IServiceResponse, IUserSession, ListAPIResponse, ServiceResponse } from "@models";
+import { IListAPIResponse, IMasterData, IMasterDataListAPIRequest, IServiceResponse, IUserSession, ListAPIResponse, ServiceResponse } from "@models";
 const TAG = 'service.master_data'
 
 // job type
@@ -79,29 +79,34 @@ export async function deleteJobType(jobTypeUid: string, userSession: IUserSessio
   return serviceResponse
 }
 
-export async function getJobTypes(userSession: IUserSession, queryParams: IBaseListAPIRequest): Promise<IServiceResponse> {
+export async function getJobTypes(userSession: IUserSession, queryParams: IMasterDataListAPIRequest): Promise<IServiceResponse> {
   logger.info(`${TAG}.getJobTypes()`);
   let connection = null;
   const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, "Job type details fetched successfully");
   try {
     connection = await getConnection();
-    const { list, totalResultsCount } = await MasterData.getJobTypes(connection, queryParams);
-    let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
-    if (offset < 0) {
-      offset = 0;
+    const { list, totalResultsCount } = await MasterData.getJobTypesWithPagination(connection, queryParams);
+    if (queryParams.isPaginated) {
+      let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
+      if (offset < 0) {
+        offset = 0;
+      }
+      const responseData: IListAPIResponse = new ListAPIResponse(
+        list,
+        parseInt(totalResultsCount.count) > (queryParams.pageNum * queryParams.pageSize),
+        offset + 1,
+        offset + list?.length,
+        parseInt(totalResultsCount.count),
+        queryParams.sortBy,
+        queryParams.sortOrder,
+        queryParams.pageNum,
+        queryParams.pageSize
+      )
+      serviceResponse.data = responseData;
     }
-    const responseData: IListAPIResponse = new ListAPIResponse(
-      list,
-      parseInt(totalResultsCount.count) > (queryParams.pageNum * queryParams.pageSize),
-      offset + 1,
-      offset + list?.length,
-      parseInt(totalResultsCount.count),
-      queryParams.sortBy,
-      queryParams.sortOrder,
-      queryParams.pageNum,
-      queryParams.pageSize
-    )
-    serviceResponse.data = responseData;
+    else {
+      serviceResponse.data = list;
+    }
   } catch (error) {
     logger.error(`Error occured in ${TAG}.getJobTypes()`, error);
     serviceResponse.addServerError('Failed to fetch job type details due to tech difficulties');
@@ -194,23 +199,27 @@ export async function getEmploymentTypes(userSession: IUserSession, queryParams:
   const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, "employment type details fetched successfully");
   try {
     connection = await getConnection();
-    const { list, totalResultsCount } = await MasterData.getEmploymentTypes(connection, userSession, queryParams)
-    let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
-    if (offset < 0) {
-      offset = 0;
+    const { list, totalResultsCount } = await MasterData.getEmploymentTypesWithPagination(connection, userSession, queryParams)
+    if (queryParams.isPaginated) {
+      let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
+      if (offset < 0) {
+        offset = 0;
+      }
+      const responseData: IListAPIResponse = new ListAPIResponse(
+        list,
+        parseInt(totalResultsCount.count) > (queryParams.pageNum * queryParams.pageSize),
+        offset + 1,
+        offset + list?.length,
+        parseInt(totalResultsCount.count),
+        queryParams.sortBy,
+        queryParams.sortOrder,
+        queryParams.pageNum,
+        queryParams.pageSize
+      )
+      serviceResponse.data = responseData;
+    } else {
+      serviceResponse.data = list;
     }
-    const responseData: IListAPIResponse = new ListAPIResponse(
-      list,
-      parseInt(totalResultsCount.count) > (queryParams.pageNum * queryParams.pageSize),
-      offset + 1,
-      offset + list?.length,
-      parseInt(totalResultsCount.count),
-      queryParams.sortBy,
-      queryParams.sortOrder,
-      queryParams.pageNum,
-      queryParams.pageSize
-    )
-    serviceResponse.data = responseData;
   } catch (error) {
     logger.error(`Error occured in ${TAG}.getEmploymentTypes()`, error)
     serviceResponse.addServerError('Failed to  fetch employment type details due to tech difficultied');
@@ -352,23 +361,27 @@ export async function getJobShifts(userSession: IUserSession, queryParams: any):
   const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, "job shifts details fetched successfully");
   try {
     connection = await getConnection();
-    const { list, totalResultsCount } = await MasterData.getJobShifts(connection, userSession, queryParams)
-    let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
-    if (offset < 0) {
-      offset = 0;
+    const { list, totalResultsCount } = await MasterData.getJobShiftsWithPagination(connection, userSession, queryParams)
+    if (queryParams.isPaginated) {
+      let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
+      if (offset < 0) {
+        offset = 0;
+      }
+      const responseData: IListAPIResponse = new ListAPIResponse(
+        list,
+        parseInt(totalResultsCount.count) > (queryParams.pageNum * queryParams.pageSize),
+        offset + 1,
+        offset + list?.length,
+        parseInt(totalResultsCount.count),
+        queryParams.sortBy,
+        queryParams.sortOrder,
+        queryParams.pageNum,
+        queryParams.pageSize
+      )
+      serviceResponse.data = responseData;
+    } else {
+      serviceResponse.data = list;
     }
-    const responseData: IListAPIResponse = new ListAPIResponse(
-      list,
-      parseInt(totalResultsCount.count) > (queryParams.pageNum * queryParams.pageSize),
-      offset + 1,
-      offset + list?.length,
-      parseInt(totalResultsCount.count),
-      queryParams.sortBy,
-      queryParams.sortOrder,
-      queryParams.pageNum,
-      queryParams.pageSize
-    )
-    serviceResponse.data = responseData;
   } catch (error) {
     logger.error(`Error occured in ${TAG}.getJobShifts()`, error)
     serviceResponse.addServerError('Failed to  fetch job shifts details due to tech difficulties');
@@ -495,23 +508,27 @@ export async function getSkills(queryParams: any): Promise<IServiceResponse> {
   const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, "skill details fetched successfully");
   try {
     connection = await getConnection()
-    const { list, totalResultsCount } = await MasterData.getSkills(connection, queryParams);
-    let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
-    if (offset < 0) {
-      offset = 0;
+    const { list, totalResultsCount } = await MasterData.getSkillsWithPagination(connection, queryParams);
+    if (queryParams.isPaginated) {
+      let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
+      if (offset < 0) {
+        offset = 0;
+      }
+      const responseData: IListAPIResponse = new ListAPIResponse(
+        list,
+        parseInt(totalResultsCount.count) > (queryParams.pageNum * queryParams.pageSize),
+        offset + 1,
+        offset + list?.length,
+        parseInt(totalResultsCount.count),
+        queryParams.sortBy,
+        queryParams.sortOrder,
+        queryParams.pageNum,
+        queryParams.pageSize
+      )
+      serviceResponse.data = responseData;
+    } else {
+      serviceResponse.data = list;
     }
-    const responseData: IListAPIResponse = new ListAPIResponse(
-      list,
-      parseInt(totalResultsCount.count) > (queryParams.pageNum * queryParams.pageSize),
-      offset + 1,
-      offset + list?.length,
-      parseInt(totalResultsCount.count),
-      queryParams.sortBy,
-      queryParams.sortOrder,
-      queryParams.pageNum,
-      queryParams.pageSize
-    )
-    serviceResponse.data = responseData;
   } catch (error) {
     logger.error(`ERROR occurred in ${TAG}.getSkills() `, error);
     serviceResponse.addServerError('Failed to fetched skills details due to tech difficulties');
@@ -642,23 +659,27 @@ export async function getTools(queryParams: any, userSession: IUserSession): Pro
   const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, "tools details fetched successfully");
   try {
     connection = await getConnection()
-    const { list, totalResultsCount } = await MasterData.getTools(connection, queryParams, userSession);
-    let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
-    if (offset < 0) {
-      offset = 0;
+    const { list, totalResultsCount } = await MasterData.getToolsWithPagination(connection, queryParams, userSession);
+    if (queryParams.isPaginated) {
+      let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
+      if (offset < 0) {
+        offset = 0;
+      }
+      const responseData: IListAPIResponse = new ListAPIResponse(
+        list,
+        parseInt(totalResultsCount.count) > (queryParams.pageNum * queryParams.pageSize),
+        offset + 1,
+        offset + list?.length,
+        parseInt(totalResultsCount.count),
+        queryParams.sortBy,
+        queryParams.sortOrder,
+        queryParams.pageNum,
+        queryParams.pageSize
+      )
+      serviceResponse.data = responseData;
+    } else {
+      serviceResponse.data = list;
     }
-    const responseData: IListAPIResponse = new ListAPIResponse(
-      list,
-      parseInt(totalResultsCount.count) > (queryParams.pageNum * queryParams.pageSize),
-      offset + 1,
-      offset + list?.length,
-      parseInt(totalResultsCount.count),
-      queryParams.sortBy,
-      queryParams.sortOrder,
-      queryParams.pageNum,
-      queryParams.pageSize
-    )
-    serviceResponse.data = responseData;
   } catch (error) {
     logger.error(`ERROR occurred in ${TAG}.getTools() `, error);
     serviceResponse.addServerError('Failed to fetched tools details due to tech difficulties');
@@ -785,23 +806,27 @@ export async function getInterviewRounds(queryParams: any, userSession: IUserSes
   const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, "interview rounds fetched successfully");
   try {
     connection = await getConnection()
-    const { list, totalResultsCount } = await MasterData.getInterviewRounds(connection, queryParams, userSession)
-    let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
-    if (offset < 0) {
-      offset = 0;
+    const { list, totalResultsCount } = await MasterData.getInterviewRoundsWithPagination(connection, queryParams, userSession);
+    if (queryParams.isPaginated) {
+      let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
+      if (offset < 0) {
+        offset = 0;
+      }
+      const responseData: IListAPIResponse = new ListAPIResponse(
+        list,
+        parseInt(totalResultsCount.count) > (queryParams.pageNum * queryParams.pageSize),
+        offset + 1,
+        offset + list?.length,
+        parseInt(totalResultsCount.count),
+        queryParams.sortBy,
+        queryParams.sortOrder,
+        queryParams.pageNum,
+        queryParams.pageSize
+      )
+      serviceResponse.data = responseData;
+    } else {
+      serviceResponse.data = list;
     }
-    const responseData: IListAPIResponse = new ListAPIResponse(
-      list,
-      parseInt(totalResultsCount.count) > (queryParams.pageNum * queryParams.pageSize),
-      offset + 1,
-      offset + list?.length,
-      parseInt(totalResultsCount.count),
-      queryParams.sortBy,
-      queryParams.sortOrder,
-      queryParams.pageNum,
-      queryParams.pageSize
-    )
-    serviceResponse.data = responseData;
   } catch (error) {
     logger.error(`ERROR occurred in ${TAG}.getInterviewRounds() `, error);
     serviceResponse.addServerError('Failed to fetched interview rounds details due to tech difficulties');

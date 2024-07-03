@@ -45,6 +45,7 @@ export function requestMasterDataQueryMapping(query: any): IMasterDataListAPIReq
         if (query?.pageSize === '') {
             query.pageSize = Pagination.PAGE_SIZE;
         }
+        query.isPaginated = query.isPaginated !== undefined && query.isPaginated !== '' ? query.isPaginated === 'true' : true;
 
         return new MasterDataListAPIRequest(
             query?.searchText,
@@ -53,7 +54,8 @@ export function requestMasterDataQueryMapping(query: any): IMasterDataListAPIReq
             query?.queryId,
             query?.sortBy,
             query?.sortOrder,
-            query?.categoryId
+            query?.categoryId,
+            query?.isPaginated ?? true
         )
     }
     catch (error) {
@@ -74,7 +76,7 @@ export function requestTemplatesListQueryMapping(query: any): ITemplatesListAPIR
             query?.pageNum,
             query?.pageSize,
             query?.categoryId,
-           
+
         )
     } catch (error) {
         logger.error(`ERROR occurred in helpers.data_mapping.request_query.requestTemplatesListQueryMapping() `);
@@ -90,18 +92,23 @@ export function requestJobsListQueryMapping(query: any): IJobsListAPIRequest {
         if (query?.pageSize === '') {
             query.pageSize = Pagination.PAGE_SIZE;
         }
+        if (query?.isActionableJobs === 'true') {
+            query.isActionableJobs = true
+        } else {
+            query.isActionableJobs = false
+        }
         return new JobsListAPIRequest(
-            query?.searchText,
+            query?.searchText || '',
             query?.pageNum,
             query?.pageSize,
             query?.categoryId,
-            query?.programId,
-            query?.templateUid
-           
+            query?.isActionableJobs
+
         )
     } catch (error) {
         logger.error(`ERROR occurred in helpers.data_mapping.request_query.requestJobsListQueryMapping() `);
         throw error;
     }
 }
+
 

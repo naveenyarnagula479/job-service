@@ -56,7 +56,7 @@ export async function getJobTypes(req: any, res: Response, next: NextFunction): 
     logger.info(TAG + '.getJobTypes()');
     try {
         const userSession: IUserSession = req.userSession;
-        const queryParams: IBaseListAPIRequest = requestQueryDataMapping(req.query);
+        const queryParams: IBaseListAPIRequest = requestMasterDataQueryMapping(req.query);
         const response: IServiceResponse = await MasterData.getJobTypes(userSession, queryParams);
         responseBuilder(response, res, next, req);
     } catch (error) {
@@ -97,7 +97,7 @@ export async function getEmploymentTypes(req: any, res: Response, next: NextFunc
     logger.info(TAG + '.getEmploymentTypes');
     try {
         const userSession: IUserSession = req.userSession;
-        const queryParams: IBaseListAPIRequest = requestQueryDataMapping(req.query);
+        const queryParams: IBaseListAPIRequest = requestMasterDataQueryMapping(req.query);
         const response: IServiceResponse = await MasterData.getEmploymentTypes(userSession, queryParams)
         responseBuilder(response, res, next, req)
     } catch (error) {
@@ -194,7 +194,7 @@ export async function getJobShifts(req: any, res: Response, next: NextFunction):
     logger.info(TAG + '.getJobShifts');
     try {
         const userSession: IUserSession = req.userSession;
-        const queryParams: IBaseListAPIRequest = requestQueryDataMapping(req.query);
+        const queryParams: IBaseListAPIRequest = requestMasterDataQueryMapping(req.query);
         const response: IServiceResponse = await MasterData.getJobShifts(userSession, queryParams)
         responseBuilder(response, res, next, req)
     } catch (error) {
@@ -376,7 +376,7 @@ export async function updateInterviewRound(req: any, res: Response, next: NextFu
     try {
         logger.debug(`update interview round object ${JSON.stringify(req.body)}`)
         const userSession: IUserSession = req.userSession;
-        const interviewRoundUid = req.params.interViewRoundUid
+        const interviewRoundUid = req.params.interviewRoundUid
         const interviewRoundDetails: IMasterData = masterDataMapping(req.body)
         const response: IServiceResponse = await MasterData.updateInterviewRound(interviewRoundDetails, interviewRoundUid, userSession)
         responseBuilder(response, res, next, req)
@@ -390,7 +390,7 @@ export async function deleteInterviewRound(req: any, res: Response, next: NextFu
     logger.info(TAG + '.deleteInterviewRound()');
     try {
         const userSession: IUserSession = req.userSession;
-        const interViewRoundUid = req.params.interViewRoundUid
+        const interViewRoundUid = req.params.interviewRoundUid
         const response: IServiceResponse = await MasterData.deleteInterviewRound(interViewRoundUid, userSession)
         responseBuilder(response, res, next, req)
     } catch (error) {
@@ -403,7 +403,7 @@ export async function getInterviewRounds(req: any, res: Response, next: NextFunc
     logger.info(TAG + '.getInterviewRounds()');
     try {
         const userSession: IUserSession = req.userSession;
-        const queryParams: IMasterDataListAPIRequest = requestMasterDataQueryMapping(req.query)
+        const queryParams: IMasterDataListAPIRequest = requestMasterDataQueryMapping(req.query);
         const response: IServiceResponse = await MasterData.getInterviewRounds(queryParams, userSession)
         responseBuilder(response, res, next, req)
     } catch (error) {
@@ -416,7 +416,7 @@ export async function getInterviewRoundsByUid(req: any, res: Response, next: Nex
     logger.info(TAG + '.getInterviewRoundsByUid');
     try {
         const userSession: IUserSession = req.userSession;
-        const interviewRoundUid = req.params.interViewRoundUid
+        const interviewRoundUid = req.params.interviewRoundUid
         const response: IServiceResponse = await MasterData.getInterviewRoundsByUid(interviewRoundUid, userSession)
         responseBuilder(response, res, next, req)
     } catch (error) {

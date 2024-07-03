@@ -51,3 +51,14 @@ export const EXAM_STATUS = {
     inProgress: 'IN_PROGRESS',
     completed: 'COMPLETED'
 }
+
+export const JOB_STATUS = {
+    drafted: 'DRAFTED',
+    request: 'REQUEST',
+    reRequest: 'RE_REQUEST',
+    onHold: 'ON_HOLD',
+    active: 'ACTIVE',
+    inActive: 'INACTIVE',
+    pending: 'PENDING',
+    expired: 'EXPIRED'
+}

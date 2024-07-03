@@ -1,4 +1,6 @@
 import logger from '@logger';
+import moment from 'moment';
+
 
 export function generateRandomAlphaNumericString(length: number): string {
     const possible = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
@@ -88,4 +90,20 @@ export const generatePassword = (length) => {
 export async function getAmountByPercentage(price, percentage) {
     const amount = price * (percentage / 100);
     return Number(amount.toFixed(2));
+}
+
+
+
+export async function calculateRemainingDays(requestAcceptedDate: Date, jobValidDays: number) {
+    const acceptedDate = moment(requestAcceptedDate);
+
+    // Calculate the difference in days between today and the request accepted date
+    const currentDate = moment();
+    const daysSinceAccepted = currentDate.diff(acceptedDate, 'days');
+
+    // Calculate the number of days remaining
+    const remainingDays = jobValidDays - daysSinceAccepted;
+
+    // Ensure remaining days are not negative
+    return remainingDays > 0 ? remainingDays : 0;
 }

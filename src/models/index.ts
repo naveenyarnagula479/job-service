@@ -25,8 +25,8 @@ export {
     EmailSender, IAPIError, IAssignments, IAuditInfo, IBaseListAPIRequest, IBaseRecord, IBaseRecordAudit,
     ICourseDetails, IEmailRecipient, IEmailSender, IJwtPayload, ILessonDetails, IListAPIResponse, IModuleDetails, ISectionDetails,
     IServiceResponse, ITestDetails, IUserSession, JwtPayload, ListAPIResponse, SectionDetails, ServiceResponse,
-    UserSession, assignment, courseDetails, lessonDetails, moduleDetails, testDetails, BillingAddress, IBillingAddress,
-    MasterDataDetails, IMasterData,  ITemplates, templates, IMasterTemplates, masterTemplates, IJobs, jobs, TemplatesListAPIRequest, 
-    ITemplatesListAPIRequest, JobsListAPIRequest, IJobsListAPIRequest, IMasterDataListAPIRequest, MasterDataListAPIRequest, 
+    UserSession, assignment, courseDetails, lessonDetails, moduleDetails, testDetails, BillingAddress, IBillingAddress, templates, ITemplates,
+    masterTemplates, IMasterTemplates, TemplatesListAPIRequest, ITemplatesListAPIRequest, IJobs, jobs, JobsListAPIRequest, IJobsListAPIRequest,
+    MasterDataDetails, IMasterData, MasterDataListAPIRequest, IMasterDataListAPIRequest
 };
 

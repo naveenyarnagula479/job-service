@@ -74,11 +74,23 @@ async function getStudentJobsWithPagination(queryParams: any, userSession: IUser
                 jobs = await JobsData.getAllStudentActiveJobs(userSession.userId);
                 break;
         }
-
         let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
         if (offset < 0) {
             offset = 0;
         }
+        const allStudentJobs = await StudentJobData.getAllStudentJobs();
+        const applicationCountMap = allStudentJobs.reduce((acc, application) => {
+            const jobUid = application.jobUid;
+            acc[jobUid] = (acc[jobUid] || 0) + 1;
+            return acc;
+        }, {});
+
+        jobs = jobs.map(job => {
+            return {
+                ...job,
+                "noOfApplicants": applicationCountMap[job.jobUid] || 0
+            }
+        })
         const url = AUTH_SERVICE_CONF.baseUrl + AUTH_SERVICE_CONF.recruiter;
         const response = await axios.get(url);
         const users = response?.data.data || [];
@@ -104,15 +116,15 @@ async function getStudentJobsWithPagination(queryParams: any, userSession: IUser
             filteredData = filteredData.filter(item => employmentTypeIds.includes(item.employmentType.id));
         }
 
-        if (queryParams.experienceFrom !== '' && queryParams.experienceTo !== '' && queryParams.experienceFrom !== undefined && queryParams.experienceTo !== undefined) {
+        if (queryParams.minExperience !== '' && queryParams.minExperience !== '' && queryParams.maxExperience !== undefined && queryParams.maxExperience !== undefined) {
             filteredData = filteredData.filter(item => {
-                return item.experience >= parseInt(queryParams.experienceFrom) && item.experience <= parseInt(queryParams.experienceTo);
+                return item.experience >= parseInt(queryParams.minExperience) && item.experience <= parseInt(queryParams.maxExperience);
             });
         }
 
-        if (queryParams.salaryFrom !== '' && queryParams.salaryTo !== '' && queryParams.salaryFrom !== undefined && queryParams.salaryTo !== undefined) {
+        if (queryParams.minSalary !== '' && queryParams.maxSalary !== '' && queryParams.minSalary !== undefined && queryParams.maxSalary !== undefined) {
             filteredData = filteredData.filter(item => {
-                return item.salary >= parseInt(queryParams.salaryFrom) && item.salary <= parseInt(queryParams.salaryTo);
+                return item.salary >= parseInt(queryParams.minSalary) && item.salary <= parseInt(queryParams.maxSalary);
             });
         }
 
@@ -210,11 +222,8 @@ async function getAdminJobsWithPagination(queryParams: any, userSession: IUserSe
         } else {
             for (var index in filteredData) {
                 const data = filteredData[index];
-                if (data?.isRerequest) {
-                    data.jobStatus = (data.jobStatus === JOB_STATUS.pending && data.previousStatus === JOB_STATUS.onHold) ? JOB_STATUS.reRequest : data.jobStatus;
-                } else {
-                    data.jobStatus = (data.jobStatus === JOB_STATUS.pending && data.previousStatus === JOB_STATUS.drafted) ? JOB_STATUS.newRequest : data.jobStatus;
-                }
+                data.jobStatus = (data.jobStatus === JOB_STATUS.pending && data.previousStatus === JOB_STATUS.onHold) ? JOB_STATUS.reRequest : data.jobStatus;
+                data.jobStatus = (data.jobStatus === JOB_STATUS.pending && data.previousStatus === JOB_STATUS.drafted) ? JOB_STATUS.newRequest : data.jobStatus;
             }
         }
         const responseData: IListAPIResponse = new ListAPIResponse(
@@ -245,7 +254,7 @@ export async function updateJobsByUid(userSession: IUserSession, jobDetails: IJo
     try {
         const jobData = await JobsData.getJobsByUid(jobUid);
         if (jobData.jobUid) {
-            if (jobData.status === JOB_STATUS.drafted) {
+            if (jobData.jobStatus === JOB_STATUS.drafted || jobData.jobStatus === JOB_STATUS.onHold) {
                 const isJobExist = await JobsData.checkJobNameExists(jobData.jobTitle, userSession.userId, jobUid);
                 if (isJobExist.jobUid) {
                     serviceResponse.addBadRequestError('job name already exist');
@@ -382,16 +391,24 @@ async function updateJobStatusByAmdin(userSession: IUserSession, payload: any, j
                 const result = await JobPostingMessagesData.addJobPostingMessage(payload, jobDetails.jobUid, userSession.userId);
                 switch (payload.status) {
                     case JOB_STATUS.onHold:
-                        await JobsData.updateJobStatus(jobDetails.jobUid, userSession.userId, payload.status, jobDetails.jobStatus, result.messageUid);
-                        pendingJobNotification(payload, user);
+                        if (jobDetails.jobStatus !== JOB_STATUS.active) {
+                            await JobsData.updateJobStatus(jobDetails.jobUid, userSession.userId, payload.status, jobDetails.jobStatus, result.messageUid);
+                            pendingJobNotification(payload, user);
+                        } else {
+                            serviceResponse.addBadRequestError('You can\'t update this job');
+                        }
                         break;
                     case JOB_STATUS.active:
                         await JobsData.updateJobStatus(jobDetails.jobUid, userSession.userId, payload.status, jobDetails.jobStatus, result.messageUid);
                         activeJobNotification(payload, user, jobDetails);
                         break;
                     case JOB_STATUS.inActive:
-                        await JobsData.updateJobStatus(jobDetails.jobUid, userSession.userId, payload.status, jobDetails.jobStatus, result.messageUid);
-                        inActiveJobNotification(payload, user, jobDetails);
+                        if (jobDetails.jobStatus === JOB_STATUS.active) {
+                            await JobsData.updateJobStatus(jobDetails.jobUid, userSession.userId, payload.status, jobDetails.jobStatus, result.messageUid);
+                            inActiveJobNotification(payload, user, jobDetails);
+                        } else {
+                            serviceResponse.addBadRequestError('You can\'t update this job');
+                        }
                         break;
                     default: break;
                 }
@@ -428,11 +445,18 @@ export async function applyStudentJob(jobUid: string, userSession: IUserSession)
     try {
         const jobDetails = await JobsData.getJobsByUid(jobUid);
         if (jobDetails.jobStatus === JOB_STATUS.active) {
-            const studentJobDetails = await StudentJobData.getStudentJobByUid(jobUid, userSession.userId);
-            if (studentJobDetails.jobUid) {
-                await StudentJobData.updateStudentAppliedJob(studentJobDetails.studentJobUid, userSession.userId);
+            const url = AUTH_SERVICE_CONF.baseUrl + AUTH_SERVICE_CONF.student + `/${userSession.userId}`;
+            const response = await axios.get(url);
+            const student = response?.data.data;
+            if (student.resumeFileUid) {
+                const studentJobDetails = await StudentJobData.getStudentJobByUid(jobUid, userSession.userId);
+                if (studentJobDetails.jobUid) {
+                    await StudentJobData.updateStudentAppliedJob(studentJobDetails.studentJobUid, userSession.userId);
+                } else {
+                    await StudentJobData.addStudentJob(jobUid, userSession.userId, student.resumeFileUid, true,);
+                }
             } else {
-                await StudentJobData.addStudentJob(jobUid, userSession.userId, true);
+                serviceResponse.addBadRequestError('Please complete your profile');
             }
         } else {
             serviceResponse.addBadRequestError(`job uid doesn't exist`);
@@ -454,7 +478,7 @@ export async function toggleSaveJobStatus(jobUid: string, userSession: IUserSess
             if (studentJobDetails.jobUid) {
                 await StudentJobData.updateStudentSavedJob(studentJobDetails.studentJobUid, userSession.userId, isSaved);
             } else {
-                await StudentJobData.addStudentJob(jobUid, userSession.userId, false, true);
+                await StudentJobData.addStudentJob(jobUid, userSession.userId, null, false, true);
             }
         } else {
             serviceResponse.addBadRequestError(`job uid doesn't exist`);

@@ -106,10 +106,10 @@ export function requestJobsListQueryMapping(query: any): IJobsListAPIRequest {
             query?.location,
             query?.jobTypeIds,
             query?.employmentTypeIds,
-            query?.salaryFrom,
-            query?.salaryTo,
-            query?.experienceFrom,
-            query?.experienceTo,
+            query?.minSalary,
+            query?.maxSalary,
+            query?.minExperience,
+            query?.maxExperience,
             query?.type || 'ALL'
         )
     } catch (error) {

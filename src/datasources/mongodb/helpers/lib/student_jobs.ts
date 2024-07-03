@@ -1,5 +1,5 @@
 import logger from "@logger";
-import { findOne, findOneAndUpdate } from "../query";
+import { findAllRecords, findOne, findOneAndUpdate } from "../query";
 import StudentJobData from '@mongodb/models/student_jobs';
 import { toCamelCase } from "@utils/formatter";
 import mongoose from "mongoose";
@@ -22,7 +22,7 @@ export async function getStudentJobByUid(jobUid: string, studentId: number): Pro
     }
 }
 
-export async function addStudentJob(jobUid: string, studentId: number, isApplied: boolean, isSaved: boolean = false): Promise<any> {
+export async function addStudentJob(jobUid: string, studentId: number, resumeFileUid?: string, isApplied: boolean = false, isSaved: boolean = false): Promise<any> {
     logger.info(TAG + '.addStudentJob() ');
     try {
         const studentJob = new StudentJobData({
@@ -32,7 +32,8 @@ export async function addStudentJob(jobUid: string, studentId: number, isApplied
             is_applied: isApplied,
             is_saved: isSaved,
             ...(isApplied) && { applied_date: new Date() },
-            created_at: studentId,
+            ...(resumeFileUid) && { resume_file_uid: resumeFileUid },
+            created_by: studentId,
             selection_status: 'IN_PROGRESS'
         })
         await studentJob.save();
@@ -70,6 +71,17 @@ export async function updateStudentSavedJob(studentJobUid: string, studentId: nu
             });
     } catch (error) {
         logger.error(`ERROR occurred in ${TAG}.updateStudentSavedJob() `, error);
+        throw error;
+    }
+}
+
+export async function getAllStudentJobs() {
+    logger.info(TAG + '.getAllStudentJobs() ');
+    try {
+        const result = await findAllRecords(StudentJobData, {}, { _id: 0 });
+        return result.map(item => toCamelCase(item.toObject()));
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.getAllStudentJobs() `, error);
         throw error;
     }
 }

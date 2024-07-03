@@ -24,6 +24,10 @@ const studentJobSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    resume_file_uid: {
+        type: String,
+        default: false,
+    },
     selection_status: {
         type: String,
         enum: ['IN_PROGRESS', 'SELECTED', 'REJECTED'],
@@ -49,6 +53,6 @@ const studentJobSchema = new mongoose.Schema({
         type: Date,
         default: null,
     }
-    });
+});
 
 export default mongoose.model(modelName, studentJobSchema);

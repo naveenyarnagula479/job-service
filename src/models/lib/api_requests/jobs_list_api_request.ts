@@ -9,10 +9,10 @@ export interface IJobsListAPIRequest extends IBaseListAPIRequest {
   location: string,
   jobTypeIds: string,
   employmentTypeIds: string,
-  salaryFrom: number,
-  salaryTo: number,
-  experienceFrom: number,
-  experienceTo: number,
+  minSalary: number,
+  maxSalary: number,
+  minExperience: number,
+  maxExperience: number,
   type: string,
 }
 export class JobsListAPIRequest extends BaseListAPIRequest implements IJobsListAPIRequest {
@@ -21,10 +21,10 @@ export class JobsListAPIRequest extends BaseListAPIRequest implements IJobsListA
   public location: string;
   public jobTypeIds: string;
   public employmentTypeIds: string;
-  public salaryFrom: number;
-  public salaryTo: number;
-  public experienceFrom: number;
-  public experienceTo: number;
+  public minSalary: number;
+  public maxSalary: number;
+  public minExperience: number;
+  public maxExperience: number;
   public type: string;
   constructor(
     searchText: string,
@@ -35,10 +35,10 @@ export class JobsListAPIRequest extends BaseListAPIRequest implements IJobsListA
     location: string,
     jobTypeIds: string,
     employmentTypeIds: string,
-    salaryFrom: number,
-    salaryTo: number,
-    experienceFrom: number,
-    experienceTo: number,
+    minSalary: number,
+    maxSalary: number,
+    minExperience: number,
+    maxExperience: number,
     type: string
   ) {
     super(searchText, pageNum, pageSize)
@@ -47,10 +47,10 @@ export class JobsListAPIRequest extends BaseListAPIRequest implements IJobsListA
     this.location = location
     this.jobTypeIds = jobTypeIds
     this.employmentTypeIds = employmentTypeIds
-    this.salaryFrom = salaryFrom
-    this.salaryTo = salaryTo
-    this.experienceFrom = experienceFrom
-    this.experienceTo = experienceTo
+    this.minSalary = minSalary
+    this.maxSalary = maxSalary
+    this.minExperience = minExperience
+    this.maxExperience = maxExperience
     this.type = type
   }
 }

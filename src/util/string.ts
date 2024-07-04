@@ -93,17 +93,15 @@ export async function getAmountByPercentage(price, percentage) {
 }
 
 
+export const calculateRemainingDays = (requestAcceptedDate: Date, jobValidDays: number) => {
 
-export async function calculateRemainingDays(requestAcceptedDate: Date, jobValidDays: number) {
-    const acceptedDate = moment(requestAcceptedDate);
+    const acceptedDate = moment(requestAcceptedDate).startOf('day');
 
-    // Calculate the difference in days between today and the request accepted date
-    const currentDate = moment();
+    const currentDate = moment().startOf('day');
+
     const daysSinceAccepted = currentDate.diff(acceptedDate, 'days');
 
-    // Calculate the number of days remaining
     const remainingDays = jobValidDays - daysSinceAccepted;
 
-    // Ensure remaining days are not negative
     return remainingDays > 0 ? remainingDays : 0;
 }

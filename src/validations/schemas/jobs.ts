@@ -1,3 +1,5 @@
+import { ErrorMessages } from "@constants/error_constants"
+
 export const saveJobs = {
     type: "object",
     properties: {
@@ -132,10 +134,31 @@ export const getJobs = {
             type: "string",
             enum: ["true","false"],
             errorMessage: "is actionable job should be true or false"
+        },
+        categoryId:{
+            type: "number",
+            minimum: 0,
+            errorMessage: "category id must be number"
+        },
+        location:{
+            type: "string",
+            ErrorMessage: "location should not be empty"
+        },
+        jobTYpeIds:{ 
+            type: "number",
+            minimum: 0,
+            ErrorMessage: "job type id should not empty"
+        },
+        employmentTypeIds:{ 
+            type: "number",
+            minimum: 0,
+            ErrorMessage: "job type id should not empty"
         }
+
+
     },
-    required: [],
-    additionalProperties: false
+    
+ 
 }
 export const jobUid= {
     type: "object",
@@ -146,9 +169,22 @@ export const jobUid= {
     additionalProperties: false
 }
 export const updateJob = {
-    ...saveJobs, ...jobUid,
+    type: "object",
     properties: {
-        ...saveJobs, ...jobUid
+        ...saveJobs.properties, 
+        ...jobUid.properties
     },
-    required: [ ...saveJobs.required,...jobUid.required]
+    required: [ ...saveJobs.required,...jobUid.required],
+    additionalProperties: false
+}
+export const updateJobStatus = {
+    type: "object",
+    properties:{
+        ...jobUid.properties,
+        status: {  type: "string",
+            enum: ["ON_HOLD","ACTIVE","INACTIVE"],
+            errorMessage: "status should be ON_HOLD, ACTIVE, INACTIVE"}
+    },
+    required:[...jobUid.required,"status"],
+    additionalProperties: false
 }

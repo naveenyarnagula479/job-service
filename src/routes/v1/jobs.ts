@@ -8,15 +8,21 @@ const router = Router();
 
 router.route(APIPaths.JOBS)
     .post(validation.saveJobs,isUser([USER_ROLES.recruiter]), controller.saveJobDeatils)
-    .get(validation.getJobs,isUser([USER_ROLES.recruiter, USER_ROLES.admin]), controller.getJobDetails);
+    .get(isUser([USER_ROLES.recruiter, USER_ROLES.admin]), controller.getJobDetails);
 
 router.route(APIPaths.JOBS_BY_UID)
     .put(validation.updateJob,isUser([USER_ROLES.recruiter]), controller.updateJobsByUid)
-    .get(isUser([USER_ROLES.recruiter]), controller.getJobsByUid)
-    .delete(isUser([USER_ROLES.recruiter]), controller.deleteJobsByUid)
-    .patch(isUser([USER_ROLES.recruiter]), controller.submitRecruiterRequest);
+    .get(validation.jobUid,isUser([USER_ROLES.recruiter]), controller.getJobsByUid)
+    .delete(validation.jobUid,isUser([USER_ROLES.recruiter]), controller.deleteJobsByUid)
+    .patch(validation.jobUid,isUser([USER_ROLES.recruiter]), controller.submitRecruiterRequest);
 
 router.route(APIPaths.JOBS_STATUS)
-    .patch(isAdmin, controller.updateJobStatus);
+    .patch(validation.updateJobStatus,isAdmin, controller.updateJobStatus);
+
+router.route(APIPaths.APPLY_JOB)
+    .post(isUser([USER_ROLES.student]), controller.applyStudentJob);
+
+router.route(APIPaths.SAVE_JOB)
+    .post(isUser([USER_ROLES.student]), controller.toggleSaveJobStatus);
 
 export default router;

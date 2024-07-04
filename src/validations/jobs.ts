@@ -19,8 +19,14 @@ export async function jobUid(req, res, next){
     const validateJobUidValidator = compile(validationSchema.jobUid);
     return await processErrors(req, validateJobUidValidator, next);
 }
+
 export async function updateJob(req, res, next){
     logger.info(`${TAG}.updateJob() `);
     const validateUpdateJobValidator = compile(validationSchema.updateJob);
     return await processErrors(req, validateUpdateJobValidator, next);
+}
+export async function updateJobStatus(req, res, next){
+    logger.info(`${TAG}.updateJobStatus() `);
+    const validateUpdateJobStatusValidator = compile(validationSchema.updateJobStatus);
+    return await processErrors(req, validateUpdateJobStatusValidator, next);
 }

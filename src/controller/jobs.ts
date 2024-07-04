@@ -27,7 +27,6 @@ export async function getJobDetails(req: any, res: Response, next: NextFunction)
         logger.info(TAG + `getJobDetails()`);
         const userSession: IUserSession = req.userSession;
         const queryParams = requestJobsListQueryMapping(req.query);
-        console.log(queryParams);
         const templateResponse: IServiceResponse = await jobService.getJobDetails(queryParams, userSession)
         responseBuilder(templateResponse, res, next, req);
     } catch (error) {
@@ -92,11 +91,38 @@ export async function updateJobStatus(req: any, res: Response, next: NextFunctio
         logger.info(TAG + `.updateJobStatus()`);
         const { jobUid } = req.params;
         const userSession: IUserSession = req.userSession;
-        const status = req.body.status;
-        const jobResponse: IServiceResponse = await jobService.updateJobStatus(userSession, jobUid, status);
+        const payload = req.body;
+        const jobResponse: IServiceResponse = await jobService.updateJobStatus(userSession, jobUid, payload);
         responseBuilder(jobResponse, res, next, req);
     } catch (error) {
         logger.error(`ERROR occured in ${TAG}.updateJobStatus() `);
+        next(error);
+    }
+}
+
+export async function applyStudentJob(req: any, res: Response, next: NextFunction): Promise<void> {
+    try {
+        logger.info(TAG + `.applyStudentJob() `);
+        const { jobUid } = req.params;
+        const userSession: IUserSession = req.userSession;
+        const jobResponse: IServiceResponse = await jobService.applyStudentJob(jobUid, userSession);
+        responseBuilder(jobResponse, res, next, req);
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.applyStudentJob() `);
+        next(error);
+    }
+}
+
+export async function toggleSaveJobStatus(req: any, res: Response, next: NextFunction): Promise<void> {
+    try {
+        logger.info(TAG + `.toggleSAveJobStatus() `);
+        const { jobUid } = req.params;
+        const userSession: IUserSession = req.userSession;
+        const isSaved = req.body.isSaved;
+        const jobResponse: IServiceResponse = await jobService.toggleSaveJobStatus(jobUid, userSession, isSaved);
+        responseBuilder(jobResponse, res, next, req);
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.toggleSaveJobStatus`);
         next(error);
     }
 }

@@ -6,6 +6,8 @@ import { toCamelCase } from "@utils/formatter";
 import mongoose from "mongoose";
 import { countDocuments, findAllRecords, findOne, findOneAndUpdate } from '../query';
 import { calculateRemainingDays } from "@utils/string";
+import StudentJobs from "@mongodb/models/student_jobs";
+import jobs from "@mongodb/models/jobs";
 
 const TAG = 'datasources.mongodb.helpers.lib.jobs';
 
@@ -56,6 +58,7 @@ export async function addJobs(payload: IJobs, templateDetails: any, userId: numb
             salary_type: payload.salaryType,
             experience: payload.experience,
             job_status: JOB_STATUS.drafted,
+            previous_status: JOB_STATUS.drafted,
             requested_on: new Date(),
             created_by: userId
         });
@@ -93,6 +96,7 @@ export async function getRecruiterJobsWithPagination(queryParams: any, userId: n
             accepted_at: 1,
             employment_type: '$employment_type.name',
             experience: 1,
+            location: 1,
             salary: 1,
             job_status: 1,
             created_by: 1
@@ -101,7 +105,7 @@ export async function getRecruiterJobsWithPagination(queryParams: any, userId: n
         if (queryParams.isActionableJobs) {
             for (var index in jobs) {
                 const data = jobs[index];
-                data.jobValidUpto = await calculateRemainingDays(data.acceptedAt, data.jobValidUpto);
+                data.jobValidUpto = calculateRemainingDays(data.acceptedAt, data.jobValidUpto);
             }
         }
         const totalResultsCount = await countDocuments(Jobs,
@@ -118,8 +122,47 @@ export async function getRecruiterJobsWithPagination(queryParams: any, userId: n
     }
 }
 
+export async function getAllStudentActiveJobs(studentId: number) {
+    logger.info(TAG + '.getAllStudentActiveJobs() ');
+    try {
+        const studentAppliedJobs = await findAllRecords(StudentJobs, { 'student_id': studentId, 'is_applied': true }, { _id: 0 });
+        const appliedJobUids = studentAppliedJobs.map(appliedJob => appliedJob.job_uid);
+        const result = await findAllRecords(Jobs, { 'job_uid': { '$nin': appliedJobUids }, 'job_status': JOB_STATUS.active }, { _id: 0 });
+        const jobs = result.map(job => toCamelCase(job.toObject()));
+        return jobs;
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.getAllStudentActiveJobs() `, error);
+        throw error;
+    }
+}
 
+export async function getAllAppliedJobs(studentId: number) {
+    logger.info(TAG + '.getAllAppliedJobs() ');
+    try {
+        const studentAppliedJobs = await findAllRecords(StudentJobs, { 'student_id': studentId, 'is_applied': true }, { _id: 0 });
+        const appliedJobUids = studentAppliedJobs.map(appliedJob => appliedJob.job_uid);
+        const result = await findAllRecords(Jobs, { 'job_uid': { '$in': appliedJobUids } }, { _id: 0 });
+        const jobs = result.map(job => toCamelCase(job.toObject()));
+        return jobs;
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.getAllAppliedJobs() `, error);
+        throw error;
+    }
+}
 
+export async function getAllSavedJobs(studentId: number) {
+    logger.info(TAG + '.getAllSavedJobs() ');
+    try {
+        const studentSavedJobs = await findAllRecords(StudentJobs, { 'student_id': studentId, 'is_saved': true }, { _id: 0 });
+        const savedJobUids = studentSavedJobs.map(savedJob => savedJob.job_uid);
+        const result = await findAllRecords(Jobs, { 'job_uid': { '$in': savedJobUids } }, { _id: 0 });
+        const jobs = result.map(job => toCamelCase(job.toObject()));
+        return jobs;
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.getAllSavedJobs() `, error);
+        throw error;
+    }
+}
 export async function getAllJobs(queryParams: any) {
     logger.info(TAG + '.getAllJobs()');
     try {
@@ -127,7 +170,7 @@ export async function getAllJobs(queryParams: any) {
         if (queryParams.isActionableJobs) {
             jobList.push(JOB_STATUS.active, JOB_STATUS.inActive, JOB_STATUS.expired);
         } else {
-            jobList.push(JOB_STATUS.pending, JOB_STATUS.onHold, JOB_STATUS.drafted);
+            jobList.push(JOB_STATUS.pending, JOB_STATUS.onHold);
         }
         const result = await findAllRecords(Jobs,
             {
@@ -140,6 +183,7 @@ export async function getAllJobs(queryParams: any) {
             location: 1,
             category_name: 1,
             no_of_openings: 1,
+            job_valid_upto: 1,
             admin_accepted_at: 1,
             requested_on: 1,
             accepted_at: 1,
@@ -147,16 +191,11 @@ export async function getAllJobs(queryParams: any) {
             experience: 1,
             salary: 1,
             job_status: 1,
-            created_by: 1
-
+            previous_status: 1,
+            created_by: 1,
+            is_rerequest: 1
         }, {});
-        // { skip: (queryParams.pageNum - 1) * queryParams.pageSize, limit: queryParams.pageSize });
         const jobs = result.map(job => toCamelCase(job.toObject()));
-        // const totalResultsCount = await countDocuments(Jobs,
-        //     {
-        //         ...(queryParams.categoryId) && { 'category_id': queryParams.categoryId },
-        //         'job_status': { $in: jobList }
-        //     })
         return jobs;
     } catch (error) {
         logger.error(`ERROR occurred in ${TAG}.getAllJobs() `, error);
@@ -248,7 +287,7 @@ export async function deleteJobsByUid(jobUid: string, userId: number) {
         throw error;
     }
 }
-export async function updateJobStatus(jobUid: string, userId: number, status: string) {
+export async function updateJobStatus(jobUid: string, userId: number, status: string, previousStatus: string, messageUid: string) {
     logger.info(TAG + '.updateJobStatus() ');
     try {
         await findOneAndUpdate(Jobs,
@@ -257,7 +296,9 @@ export async function updateJobStatus(jobUid: string, userId: number, status: st
                 job_status: status,
                 updated_by: userId,
                 updated_at: new Date(),
-                ...(status === JOB_STATUS.active) && { 'accepted_at': new Date(), 'published_at': new Date() }
+                previous_status: previousStatus,
+                ...(status === JOB_STATUS.active) && { 'accepted_at': new Date(), 'published_at': new Date() },
+                message_uid: messageUid
             });
     } catch (error) {
         logger.error(`ERROR occurred in ${TAG}.updateJobStatus() `, error);

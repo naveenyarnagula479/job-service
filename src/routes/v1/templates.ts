@@ -6,7 +6,7 @@ import * as validation from '@validations';
 const router = Router();
 
 router.route(APIPaths.MASTER_TEMPLATES)
-    .post(validation.saveMasterTemplate, isAdmin,controller.saveMasterTemplates)
+    .post(isAdmin,controller.saveMasterTemplates)
     .get(isAdmin,controller.getMasterTemplates)
 
 router.route(APIPaths.TEMPLATES)

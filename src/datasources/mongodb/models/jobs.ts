@@ -105,9 +105,14 @@ const jobsSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    previous_status: {
+        type: String,
+        enum: [JOB_STATUS.drafted, JOB_STATUS.newRequest, JOB_STATUS.reRequest, JOB_STATUS.onHold, JOB_STATUS.active, JOB_STATUS.inActive, JOB_STATUS.pending],
+        required: true,
+    },
     job_status: {
         type: String,
-        enum: [JOB_STATUS.drafted, JOB_STATUS.request, JOB_STATUS.reRequest, JOB_STATUS.onHold, JOB_STATUS.active, JOB_STATUS.inActive, JOB_STATUS.pending],
+        enum: [JOB_STATUS.drafted, JOB_STATUS.newRequest, JOB_STATUS.reRequest, JOB_STATUS.onHold, JOB_STATUS.active, JOB_STATUS.inActive, JOB_STATUS.pending],
         required: true
     },
     is_rerequest: {
@@ -123,6 +128,9 @@ const jobsSchema = new mongoose.Schema({
     },
     published_at: {
         type: Date
+    },
+    message_uid: {
+        type: String
     },
     created_by: {
         type: Number,

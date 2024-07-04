@@ -30,3 +30,8 @@ export async function updateJobStatus(req, res, next){
     const validateUpdateJobStatusValidator = compile(validationSchema.updateJobStatus);
     return await processErrors(req, validateUpdateJobStatusValidator, next);
 }
+export async function saveStudentJobs(req, res, next){
+    logger.info(`${TAG}.saveStudentJobs() `);
+    const validateSaveStudentJobsValidator = compile(validationSchema.saveStudentJobs);
+    return await processErrors(req, validateSaveStudentJobsValidator, next);
+}

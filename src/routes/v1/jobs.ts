@@ -17,12 +17,12 @@ router.route(APIPaths.JOBS_BY_UID)
     .patch(validation.jobUid,isUser([USER_ROLES.recruiter]), controller.submitRecruiterRequest);
 
 router.route(APIPaths.JOBS_STATUS)
-    .patch(validation.updateJobStatus,isAdmin, controller.updateJobStatus);
+    .patch(validation.updateJobStatus,isUser([USER_ROLES.recruiter, USER_ROLES.admin]), controller.updateJobStatus);
 
 router.route(APIPaths.APPLY_JOB)
-    .post(isUser([USER_ROLES.student]), controller.applyStudentJob);
+    .post(validation.jobUid,isUser([USER_ROLES.student]), controller.applyStudentJob);
 
 router.route(APIPaths.SAVE_JOB)
-    .post(isUser([USER_ROLES.student]), controller.toggleSaveJobStatus);
+    .post(validation.saveStudentJobs,isUser([USER_ROLES.student]), controller.toggleSaveJobStatus);
 
 export default router;

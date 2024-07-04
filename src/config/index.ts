@@ -61,7 +61,8 @@ export const MONGO_DATABASE = {
 
 export const AUTH_SERVICE_CONF = {
     baseUrl: process.env.AUTH_SERVICE_BASE_URL,
-    recruiter: process.env.RECRUITERS
+    recruiter: process.env.RECRUITERS,
+    student: process.env.STUDENTS
 }
 
 export async function checkEnv() {

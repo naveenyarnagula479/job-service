@@ -188,3 +188,10 @@ export const updateJobStatus = {
     required:[...jobUid.required,"status"],
     additionalProperties: false
 }
+export const saveStudentJobs = {
+    type: "object",
+    properties:{
+        ...jobUid.properties,
+        isSaved: { type: "boolean", ErrorMessage:"isSaved should be boolean"}
+    }
+}

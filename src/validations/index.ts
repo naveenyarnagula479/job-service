@@ -2,6 +2,6 @@ import {validateMasterData,updateJobType,getJobTypeByUid,updateEmploymentType,ge
 
 
 import { saveMasterTemplate, saveTemplates, getTemplates, templateUid, updateTemplate } from "./templates";
-import { saveJobs, getJobs, jobUid, updateJob, updateJobStatus} from "./jobs"
-export { saveMasterTemplate, saveTemplates, getTemplates, templateUid, updateTemplate, saveJobs, getJobs, jobUid,updateJob, validateMasterData,updateJobType,getJobTypeByUid,updateEmploymentType,getEmploymentTypeByUid,updateJobShifts,getJobShiftsByUid,saveCourseCategory,updateCourseCategory,getCourseCategoriesByUid,validateMasterDataWithCategoryId,updateSkill, fetchSkillByUid,updateTool,fetchToolByUid,updateInterviewRound,fetchInterviewRoundByUid,getMasterData, updateJobStatus}
+import { saveJobs, getJobs, jobUid, updateJob, updateJobStatus, saveStudentJobs} from "./jobs"
+export { saveMasterTemplate, saveTemplates, getTemplates, templateUid, updateTemplate, saveJobs, getJobs, jobUid,updateJob, validateMasterData,updateJobType,getJobTypeByUid,updateEmploymentType,getEmploymentTypeByUid,updateJobShifts,getJobShiftsByUid,saveCourseCategory,updateCourseCategory,getCourseCategoriesByUid,validateMasterDataWithCategoryId,updateSkill, fetchSkillByUid,updateTool,fetchToolByUid,updateInterviewRound,fetchInterviewRoundByUid,getMasterData, updateJobStatus, saveStudentJobs}
 

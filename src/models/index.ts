@@ -19,6 +19,7 @@ import { IMasterTemplates, masterTemplates } from './lib/master_templates';
 import { IJobs, jobs } from './lib/jobs';
 import { TemplatesListAPIRequest, ITemplatesListAPIRequest } from './lib/api_requests/templates_list_api_request';
 import { JobsListAPIRequest, IJobsListAPIRequest } from './lib/api_requests/jobs_list_api_request';
+import { ICandidateListAPIRequest, CandidateListAPIRequest } from './lib/api_requests/candidate_list_api_request';
 
 export {
     APIError, AppError, AuditInfo, BaseListAPIRequest, BaseRecord, BaseRecordAudit, EmailRecipient,
@@ -27,6 +28,6 @@ export {
     IServiceResponse, ITestDetails, IUserSession, JwtPayload, ListAPIResponse, SectionDetails, ServiceResponse,
     UserSession, assignment, courseDetails, lessonDetails, moduleDetails, testDetails, BillingAddress, IBillingAddress, templates, ITemplates,
     masterTemplates, IMasterTemplates, TemplatesListAPIRequest, ITemplatesListAPIRequest, IJobs, jobs, JobsListAPIRequest, IJobsListAPIRequest,
-    MasterDataDetails, IMasterData, MasterDataListAPIRequest, IMasterDataListAPIRequest
+    MasterDataDetails, IMasterData, MasterDataListAPIRequest, IMasterDataListAPIRequest, ICandidateListAPIRequest, CandidateListAPIRequest
 };
 

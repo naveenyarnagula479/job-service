@@ -52,7 +52,6 @@ export async function getTemplates(req: any, res: Response, next: NextFunction):
     try {
         logger.info(TAG + `getTemplates()`);
         const userSession: IUserSession = req.userSession;
-        console.log(req.query);
         const queryParams = requestTemplatesListQueryMapping(req.query);
         const templateResponse: IServiceResponse = await templateService.getTemplates(queryParams, userSession);
         responseBuilder(templateResponse, res, next, req);

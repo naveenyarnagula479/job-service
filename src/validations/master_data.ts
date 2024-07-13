@@ -13,7 +13,6 @@ export async function validateMasterData(req, res, next) {
 
 export async function updateJobType(req, res, next) {
     logger.info(`${TAG}.updateJobType()`);
-    console.log(masterData.updateJobType)
     const jobTypeUpdates = compile(masterData.updateJobType);
     return await processErrors(req, jobTypeUpdates, next)
 }

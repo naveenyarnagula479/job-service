@@ -23,7 +23,6 @@ export async function saveFile(file: any, folderName: string, bucketName: string
 }
 export async function saveFileBuffer(fileBuffer: any, filePath: any, bucketName: string, fileName?: string): Promise<any> {
   log.info(`${TAG}.saveFileBuffer()`)
-  console.log(bucketName)
   try {
     const params = {
       Bucket: bucketName,

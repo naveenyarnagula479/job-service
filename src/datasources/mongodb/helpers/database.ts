@@ -21,7 +21,6 @@ export async function getMongoConnection() {
         if (MONGO_DATABASE?.username?.length && MONGO_DATABASE?.password?.length) {
             URL = `mongodb://${MONGO_DATABASE.username}:${MONGO_DATABASE.password}@${MONGO_DATABASE.address}:${MONGO_DATABASE.port}/${MONGO_DATABASE.name}?&appname=MongoDB%20Compass&ssl=false`;
         }
-        console.log(URL)
         await mongoose.connect(URL, options);
         logger.info('Mongo connection initialised successfully!!!');
         connectionEstablished = true;

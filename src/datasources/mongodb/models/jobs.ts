@@ -12,6 +12,14 @@ const jobsSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    recruiter_id: {
+        type: Number,
+        required: true,
+    },
+    recruiter_uid: {
+        type: String,
+        required: true,
+    },
     category_name: {
         type: String,
         required: true,

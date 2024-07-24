@@ -1,3 +1,4 @@
+import { JOB_STATUS } from '@constants/master_data_constants';
 import mongoose from 'mongoose';
 
 const modelName = "student_jobs";
@@ -12,6 +13,10 @@ const studentJobSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    student_uid: {
+        type: String,
+        required: true,
+    },
     job_uid: {
         type: String,
         required: true
@@ -25,12 +30,11 @@ const studentJobSchema = new mongoose.Schema({
         default: false,
     },
     resume_file_uid: {
-        type: String,
-        default: false,
+        type: String
     },
     selection_status: {
         type: String,
-        enum: ['IN_PROGRESS', 'SELECTED', 'REJECTED'],
+        enum: [JOB_STATUS.inProgress, JOB_STATUS.select, JOB_STATUS.pending, JOB_STATUS.reject],
         default: null,
     },
     applied_date: {

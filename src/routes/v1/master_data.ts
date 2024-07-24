@@ -10,7 +10,7 @@ const router = Router();
 
 router.route(APIPaths.JOB_TYPE)
     .post(validation.validateMasterData, isAdmin, MasterData.saveJobType)
-    .get(validation.getMasterData, isUser([USER_ROLES.admin, USER_ROLES.recruiter]), MasterData.getJobTypes)
+    .get(validation.getMasterData, isUser([USER_ROLES.admin, USER_ROLES.recruiter, USER_ROLES.student]), MasterData.getJobTypes)
 
 router.route(APIPaths.JOB_TYPE_BY_UID)
     .get(validation.getJobTypeByUid, isAdmin, MasterData.getJobTypeByUid)
@@ -19,7 +19,7 @@ router.route(APIPaths.JOB_TYPE_BY_UID)
 
 router.route(APIPaths.EMPLOYMENT_TYPE)
     .post(validation.validateMasterData, isAdmin, MasterData.saveEmploymentType)
-    .get(validation.getMasterData, isUser([USER_ROLES.admin, USER_ROLES.recruiter]), MasterData.getEmploymentTypes)
+    .get(validation.getMasterData, isUser([USER_ROLES.admin, USER_ROLES.recruiter, USER_ROLES.student]), MasterData.getEmploymentTypes)
 
 router.route(APIPaths.EMPLOYMENT_TYPE_BY_UID)
     .put(validation.updateEmploymentType, isAdmin, MasterData.updateEmploymentType)
@@ -28,7 +28,7 @@ router.route(APIPaths.EMPLOYMENT_TYPE_BY_UID)
 
 router.route(APIPaths.JOB_SHIFTS)
     .post(validation.validateMasterData, isAdmin, MasterData.saveJobShifts)
-    .get(validation.getMasterData, isUser([USER_ROLES.admin, USER_ROLES.recruiter]), MasterData.getJobShifts)
+    .get(validation.getMasterData, isUser([USER_ROLES.admin, USER_ROLES.recruiter, USER_ROLES.student]), MasterData.getJobShifts)
 
 router.route(APIPaths.JOB_SHIFTS_BY_UID)
     .put(validation.updateJobShifts, isAdmin, MasterData.updateJobShifts)
@@ -37,7 +37,7 @@ router.route(APIPaths.JOB_SHIFTS_BY_UID)
 
 router.route(APIPaths.SKILLS)
     .post(validation.validateMasterDataWithCategoryId, isAdmin, MasterData.saveSkill)
-    .get(validation.getMasterData, isUser([USER_ROLES.admin, USER_ROLES.recruiter]), MasterData.getSkills)
+    .get(validation.getMasterData, isUser([USER_ROLES.admin, USER_ROLES.recruiter, USER_ROLES.student]), MasterData.getSkills)
 
 router.route(APIPaths.SKILLS_BY_UID)
     .put(validation.updateSkill, isAdmin, MasterData.updateSkill)
@@ -47,7 +47,7 @@ router.route(APIPaths.SKILLS_BY_UID)
 
 router.route(APIPaths.TOOLS)
     .post(validation.validateMasterDataWithCategoryId, isAdmin, MasterData.saveTool)
-    .get(validation.getMasterData, isUser([USER_ROLES.admin, USER_ROLES.recruiter]), MasterData.getTools)
+    .get(validation.getMasterData, isUser([USER_ROLES.admin, USER_ROLES.recruiter, USER_ROLES.student]), MasterData.getTools)
 
 router.route(APIPaths.TOOLS_BY_UID)
     .put(validation.updateTool, isAdmin, MasterData.updateTool)
@@ -57,7 +57,7 @@ router.route(APIPaths.TOOLS_BY_UID)
 
 router.route(APIPaths.INTERVIEW_ROUNDS)
     .post(validation.validateMasterDataWithCategoryId, isAdmin, MasterData.saveInterviewRound)
-    .get(validation.getMasterData, isUser([USER_ROLES.admin, USER_ROLES.recruiter]), MasterData.getInterviewRounds)
+    .get(validation.getMasterData, isUser([USER_ROLES.admin, USER_ROLES.recruiter, USER_ROLES.student]), MasterData.getInterviewRounds)
 
 router.route(APIPaths.INTERVIEW_ROUNDS_BY_UID)
     .put(validation.updateInterviewRound, isAdmin, MasterData.updateInterviewRound)
@@ -66,12 +66,15 @@ router.route(APIPaths.INTERVIEW_ROUNDS_BY_UID)
 
 router.route(APIPaths.COURSE_CATEGORY)
     .post(validation.saveCourseCategory, isAdmin, MasterData.saveCourseCategory)
-    .get(isUser([USER_ROLES.admin, USER_ROLES.recruiter]), MasterData.getCourseCategories)
+    .get(isUser([USER_ROLES.admin, USER_ROLES.recruiter, USER_ROLES.student]), MasterData.getCourseCategories)
 
 router.route(APIPaths.COURSE_CATEGORY_BY_ID)
     .put(validation.updateCourseCategory, isAdmin, MasterData.updateCourseCategory)
     .delete(isAdmin, MasterData.deleteCourseCategory)
     .get(validation.getCourseCategoriesByUid, isAdmin, MasterData.getCourseCategoriesByUid)
+
+router.route(APIPaths.JOB_ROLE)
+    .get(isUser([USER_ROLES.recruiter]), MasterData.getJobRoles);
 
 
 export default router;

@@ -10,6 +10,8 @@ import * as StudentJobData from '@mongodb/helpers/lib/student_jobs';
 import { calculateRemainingDays } from "@utils/string";
 import axios from 'axios';
 import { activeJobNotification, inActiveJobNotification, pendingJobNotification } from "./mail";
+import { parseInt } from "lodash";
+import student_jobs from "@mongodb/models/student_jobs";
 
 
 const TAG = 'service.jobs'
@@ -19,9 +21,9 @@ export async function saveJobDetails(userSession: IUserSession, jobDetails: IJob
     const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.CREATED, 'Jobs created successfully');
     try {
         const templateDetails = await TemplateData.getTemplateByUid(jobDetails.templateUid);
+
         if (templateDetails.templateUid) {
             const isJobExist = await JobsData.checkJobNameExists(templateDetails.jobTitle, userSession.userId);
-            console.log(isJobExist);
             if (isJobExist.templateUid) {
                 serviceResponse.addBadRequestError('job name already exist');
             } else {
@@ -108,12 +110,11 @@ async function getStudentJobsWithPagination(queryParams: any, userSession: IUser
 
         const jobTypeIds = queryParams.jobTypeIds ? queryParams.jobTypeIds.split(',').map(id => parseInt(id)) : [];
         const employmentTypeIds = queryParams.employmentTypeIds ? queryParams.employmentTypeIds.split(',').map(id => parseInt(id)) : [];
-
         if (jobTypeIds.length) {
-            filteredData = filteredData.filter(item => jobTypeIds.includes(item.jobType.id));
+            filteredData = filteredData.filter(item => jobTypeIds.includes(parseInt(item.jobType.id)));
         }
         if (employmentTypeIds.length) {
-            filteredData = filteredData.filter(item => employmentTypeIds.includes(item.employmentType.id));
+            filteredData = filteredData.filter(item => employmentTypeIds.includes(parseInt(item.employmentType.id)));
         }
 
         if (queryParams.minExperience !== '' && queryParams.minExperience !== '' && queryParams.maxExperience !== undefined && queryParams.maxExperience !== undefined) {
@@ -190,7 +191,6 @@ async function getRecruiterJobsWithPagination(queryParams: any, userSession: IUs
 
 async function getAdminJobsWithPagination(queryParams: any, userSession: IUserSession, serviceResponse: IServiceResponse): Promise<any> {
     logger.info(`${TAG}.getAdminJobsWithPagination() `);
-    console.log(queryParams);
     try {
         const jobs = await JobsData.getAllJobs(queryParams);
         let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
@@ -279,10 +279,24 @@ export async function getJobsByUid(userSession: IUserSession, jobUid: string): P
     logger.info(`${TAG}.getJobssByUid() `);
     const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, 'jobs fetched successfully');
     try {
-        const jobDetails = await JobsData.getJobsByUid(jobUid);
+        let jobDetails = await JobsData.getJobsByUid(jobUid);
         if (jobDetails?.jobUid) {
             if (jobDetails?.messageUid) {
                 jobDetails.message = await JobPostingMessagesData.getJobPostingMessageByUid(jobDetails.messageUid);
+            }
+            if (userSession.role === USER_ROLES.admin) {
+                jobDetails.jobStatus = (jobDetails.jobStatus === JOB_STATUS.pending && jobDetails.previousStatus === JOB_STATUS.onHold) ? JOB_STATUS.reRequest : jobDetails.jobStatus;
+                jobDetails.jobStatus = (jobDetails.jobStatus === JOB_STATUS.pending && jobDetails.previousStatus === JOB_STATUS.drafted) ? JOB_STATUS.newRequest : jobDetails.jobStatus;
+            } else if (userSession.role === USER_ROLES.student) {
+                const url = AUTH_SERVICE_CONF.baseUrl + AUTH_SERVICE_CONF.recruiter + `/${jobDetails.createdBy}`
+                const response = await axios.get(url);
+                const recruiterData = response?.data.data;
+                const studentJob = await StudentJobData.getStudentJobByUid(jobDetails.jobUid, userSession.userId);
+                jobDetails = {
+                    ...jobDetails,
+                    ...recruiterData,
+                    ...(studentJob.isSaved) ? { 'isSaved': true } : { 'isSaved': false }
+                };
             }
             serviceResponse.data = jobDetails;
         } else {
@@ -290,8 +304,11 @@ export async function getJobsByUid(userSession: IUserSession, jobUid: string): P
         }
     } catch (error) {
         logger.error(`ERROR occured in ${TAG}.getJobsByUid()`, error);
-        serviceResponse.addServerError(`Failed to get jobs due to technical difficulties`);
-
+        if (error.message.includes('ECONNREFUSED')) {
+            serviceResponse.addServerError(`Client server isn't active`);
+        } else {
+            serviceResponse.addServerError(`Failed to get jobs due to technical difficulties`);
+        }
     }
     return serviceResponse;
 }
@@ -361,7 +378,7 @@ export async function updateJobStatus(userSession: IUserSession, jobUid: string,
 async function updateJobStatusByRecruiter(userSession: IUserSession, payload: any, jobDetails: any, serviceResponse: IServiceResponse) {
     logger.info(TAG + '.updateJobStatusByRecruiter() ');
     try {
-        if (jobDetails.status === JOB_STATUS.active) {
+        if (jobDetails.jobStatus === JOB_STATUS.active) {
             if (payload.status === JOB_STATUS.inActive) {
                 const result = await JobPostingMessagesData.addJobPostingMessage(payload, jobDetails.jobUid, userSession.userId);
                 await JobsData.updateJobStatus(jobDetails.jobUid, userSession.userId, payload.status, jobDetails.jobStatus, result.messageUid);
@@ -385,7 +402,6 @@ async function updateJobStatusByAmdin(userSession: IUserSession, payload: any, j
         const userReponse = await axios.get(url);
         const user = userReponse?.data?.data;
         if (user) {
-            console.log(payload);
             if (jobDetails.jobStatus !== JOB_STATUS.drafted && jobDetails.jobStatus !== JOB_STATUS.expired &&
                 jobDetails.jobStatus !== JOB_STATUS.inActive && jobDetails.jobStatus !== JOB_STATUS.onHold) {
                 const result = await JobPostingMessagesData.addJobPostingMessage(payload, jobDetails.jobUid, userSession.userId);
@@ -452,9 +468,9 @@ export async function applyStudentJob(jobUid: string, userSession: IUserSession)
             if (student.resumeFileUid) {
                 const studentJobDetails = await StudentJobData.getStudentJobByUid(jobUid, userSession.userId);
                 if (studentJobDetails.jobUid) {
-                    await StudentJobData.updateStudentAppliedJob(studentJobDetails.studentJobUid, userSession.userId);
+                    await StudentJobData.updateStudentAppliedJob(studentJobDetails.studentJobUid, student.resumeFileUid, userSession.userId);
                 } else {
-                    await StudentJobData.addStudentJob(jobUid, userSession.userId, student.resumeFileUid, true,);
+                    await StudentJobData.addStudentJob(jobUid, userSession, student.resumeFileUid, true,);
                 }
             } else {
                 serviceResponse.addBadRequestError('Please complete your profile');
@@ -479,7 +495,7 @@ export async function toggleSaveJobStatus(jobUid: string, userSession: IUserSess
             if (studentJobDetails.jobUid) {
                 await StudentJobData.updateStudentSavedJob(studentJobDetails.studentJobUid, userSession.userId, isSaved);
             } else {
-                await StudentJobData.addStudentJob(jobUid, userSession.userId, null, false, true);
+                await StudentJobData.addStudentJob(jobUid, userSession, null, false, true);
             }
         } else {
             serviceResponse.addBadRequestError(`job uid doesn't exist`);
@@ -489,4 +505,108 @@ export async function toggleSaveJobStatus(jobUid: string, userSession: IUserSess
         serviceResponse.addServerError(`Failed to save/unsave job due to tech difficulties`);
     }
     return serviceResponse;
+}
+
+export async function fetchAppliedCandidates(userSession: IUserSession, queryParams: any, token: any): Promise<IServiceResponse> {
+    logger.info(TAG + '.fetchAppliedCandidates() ');
+    const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, 'data fetched successfully');
+    try {
+        const allJobs = await JobsData.getRecruiterJobsAppliedStudents(userSession.userId, queryParams);
+        const studentIds = allJobs.map(job => job.studentId).join(',');
+        const url = AUTH_SERVICE_CONF.baseUrl + AUTH_SERVICE_CONF.student;
+        const response = await axios.get(url, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            params: { ids: studentIds }
+        });
+        const studentList = response?.data.data;
+        const combinedData = allJobs.map(job => {
+            const student = studentList.find(student => parseInt(student.studentId) === job.studentId);
+            return { ...job, ...student };
+        });
+
+        let filteredData = queryParams.searchText ? combinedData.filter(item => {
+            const userNameMatches = item.studentName.toLowerCase().includes(queryParams.searchText.toLowerCase());
+            const emailMatches = item.email.toLowerCase().includes(queryParams.searchText.toLowerCase());
+            return emailMatches || userNameMatches;
+        }) : combinedData;
+
+        if (queryParams.jobRole != undefined && queryParams.jobRole !== '') {
+            filteredData = filteredData.filter(item => {
+                return item.jobRole === queryParams.jobRole;
+            })
+        }
+        let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
+        if (offset < 0) {
+            offset = 0;
+        }
+        const startIndex = (queryParams.pageNum - 1) * queryParams.pageSize;
+        const endIndex = startIndex + queryParams.pageSize;
+        const paginatedResults = filteredData.slice(startIndex, endIndex);
+        const totalResults = filteredData.length;
+        const responseData: IListAPIResponse = new ListAPIResponse(
+            paginatedResults,
+            parseInt(totalResults) > (queryParams.pageNum * queryParams.pageSize),
+            offset + 1,
+            offset + paginatedResults?.length,
+            parseInt(totalResults),
+            queryParams.sortBy,
+            queryParams.sortOrder,
+            queryParams.pageNum,
+            queryParams.pageSize
+        )
+        serviceResponse.data = responseData;
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.fetchAppliedCandidates() `, error);
+        if (error.message.includes('ECONNREFUSED')) {
+            serviceResponse.addBadRequestError('Client server isn\t active');
+        } else {
+            serviceResponse.addServerError(`Failed to fetch applied candidates due to tech difficulties `);
+        }
+    }
+    return serviceResponse;
+}
+
+export async function getJobsByStudentUid(userSession: IUserSession, studentUid: string, jobUid: string, token: any): Promise<IServiceResponse> {
+    logger.info(TAG + 'getStudentJobByUid() ');
+    const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, 'data fetched successfully');
+    try {
+        const url = AUTH_SERVICE_CONF.baseUrl + AUTH_SERVICE_CONF.student + `/${studentUid}`;
+        const response = await axios.get(url, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const studentData = response?.data.data;
+        const studentId = studentData.studentProfileDetails.studentPersonalDetails.studentId;
+        const studentJobData = await StudentJobData.getStudentJobByUid(jobUid, parseInt(studentId));
+        serviceResponse.data = { ...studentData, studentJobData }
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.getJobsByStudentUid() `, error);
+        if (error.message.includes('ECONNREFUSED')) {
+            serviceResponse.addBadRequestError('Client server isn\'t active');
+        } else {
+            serviceResponse.addServerError('Failed to get job by student uid due to tech difficulites');
+        }
+    }
+    return serviceResponse;
+}
+
+export async function updateStudentJobStatus(userSession: IUserSession, jobUid: string, studentUid: string, status: string): Promise<IServiceResponse> {
+    logger.info(TAG + '.updateStudentJobStatus() ');
+    const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, 'status updated successfully');
+    try {
+        const studentJob: any = await StudentJobData.getStudentJobByStudentUid(jobUid, studentUid);
+        if (studentJob.jobUid) {
+            await StudentJobData.updateStudentSelectionStatus(jobUid, studentUid, status, userSession);
+        } else {
+            serviceResponse.addBadRequestError('student didn\'t applied for this job');
+        }
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.updateStudentJobStatus() `, error);
+        serviceResponse.addServerError(`Failed to update job status due to tech difficulties`);
+    }
+    return serviceResponse;
+
 }

@@ -1,13 +1,12 @@
 import { JOB_STATUS } from "@constants/master_data_constants";
 import logger from "@logger";
-import { IJobs, IUserSession } from "@models";
+import { IJobs } from "@models";
 import Jobs from '@mongodb/models/jobs';
-import { toCamelCase } from "@utils/formatter";
-import mongoose from "mongoose";
-import { countDocuments, findAllRecords, findOne, findOneAndUpdate } from '../query';
-import { calculateRemainingDays } from "@utils/string";
 import StudentJobs from "@mongodb/models/student_jobs";
-import jobs from "@mongodb/models/jobs";
+import { toCamelCase } from "@utils/formatter";
+import { calculateRemainingDays } from "@utils/string";
+import mongoose from "mongoose";
+import { countDocuments, findAllDistinctRecords, findAllRecords, findOne, findOneAndUpdate, joinTables } from '../query';
 
 const TAG = 'datasources.mongodb.helpers.lib.jobs';
 
@@ -37,6 +36,7 @@ export async function addJobs(payload: IJobs, templateDetails: any, userId: numb
             template_uid: payload.templateUid,
             program_id: templateDetails.programId,
             category_id: templateDetails.categoryId,
+            recruiter_id: userId,
             category_name: templateDetails.categoryName,
             job_title: templateDetails.jobTitle,
             description: payload.description,
@@ -359,6 +359,77 @@ export async function submitRecruiterRequest(jobUid: string, jobDetails: any, us
         )
     } catch (error) {
         logger.error(`ERROR occurred in ${TAG}.submitRecruiterRequest() `, error);
+        throw error;
+    }
+}
+
+export async function getAllRecruiterJobs(recruiterId: number): Promise<any> {
+    logger.info(TAG + '.getAllRecruiterJobs() ');
+    try {
+        const result = await findAllRecords(Jobs, { 'recruiter_id': recruiterId }, { _id: 0 });
+        return result.map(item => toCamelCase(item.toObject()));
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.getAllRecruiterJobs() `);
+        throw error;
+    }
+}
+
+export async function getRecruiterJobsAppliedStudents(recruiterId, queryParams: any): Promise<any> {
+    logger.info(TAG + '.getRecruiterJobsAppliedStudents() ');
+    try {
+
+        const pipeLine = [{
+            $lookup: {
+                from: StudentJobs.modelName,
+                localField: 'job_uid',
+                foreignField: 'job_uid',
+                as: 'jobs'
+            }
+        },
+        {
+            $unwind: '$jobs'
+        },
+        {
+            $match: {
+                recruiter_id: parseInt(recruiterId),
+                'jobs.is_applied': true,
+                ...(queryParams.status === 'PENDING') ? { 'jobs.selection_status': JOB_STATUS.pending } : { 'jobs.selection_status': { $nin: [JOB_STATUS.pending] } },
+            },
+        },
+
+        {
+            $project: {
+                _id: 0,
+                studentId: '$jobs.student_id',
+                jobUid: '$job_uid',
+                jobRole: '$job_title',
+                selectionStatus: '$jobs.selection_status',
+                appliedOn: '$jobs.applied_date',
+                isApplied: '$jobs.is_applied',
+                studentUid: '$jobs.student_uid'
+            }
+        }
+        ]
+        const result = await joinTables(Jobs, pipeLine);
+        return toCamelCase(result);
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.getRecruiterJobsAppliedStudents() `);
+        throw error;
+    }
+}
+
+export async function getJobRoles(recruiterId: number): Promise<any> {
+    logger.info(TAG + '.getJobRoles() ');
+    try {
+        const jobs = await findAllRecords(Jobs, {
+            recruiter_id: recruiterId,
+        }, {
+            _id: 0,
+            'job_role': '$job_title'
+        })
+        return jobs.map(item => toCamelCase(item.toObject()));
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.getJobRoles() `, error);
         throw error;
     }
 }

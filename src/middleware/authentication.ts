@@ -50,7 +50,6 @@ export function isAuthenticated(
         decodedToken.isEmailVerified,
         decodedToken.isPhoneVerified
       )
-      console.log(req.userSession);
       //  req.tokenType = decodedToken.tokenType
       logger.debug('LOGGED IN USER:' + nodeUtil.inspect(req.userSession))
       next()
@@ -159,6 +158,7 @@ export function isAdmin(req: any, res: Response, next: NextFunction): void {
 }
 
 export function isUser(userTypes: string[]) {
+  
   return (req: any, res: Response, next: NextFunction): void => {
     if (AUTHENTICATION.enabled) {
       logger.info(`${TAG}.isUser(): ${userTypes}`)

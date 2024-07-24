@@ -493,3 +493,15 @@ export async function getCourseCategoriesByUid(req: any, res: Response, next: Ne
         next(error)
     }
 }
+
+export async function getJobRoles(req: any, res: Response, next: NextFunction): Promise<void> {
+    logger.info(TAG + '.getJobRoles() ');
+    try {
+        const userSession: IUserSession = req.userSession;
+        const response: IServiceResponse = await MasterData.getJobRoles(userSession);
+        responseBuilder(response, res, next, req);
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.getJobRoles() `, error);
+        next(error);
+    }
+}

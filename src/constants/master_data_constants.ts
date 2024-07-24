@@ -60,7 +60,10 @@ export const JOB_STATUS = {
     active: 'ACTIVE',
     inActive: 'INACTIVE',
     pending: 'PENDING',
-    expired: 'EXPIRED'
+    expired: 'EXPIRED',
+    select : 'SELECTED',
+    reject: 'REJECTED',
+    inProgress: 'IN_PROGRESS'
 }
 
 export const STUDENT_JOB_TYPE = {

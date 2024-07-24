@@ -9,6 +9,8 @@ import {
     ITemplatesListAPIRequest,
     JobsListAPIRequest,
     TemplatesListAPIRequest,
+    ICandidateListAPIRequest,
+    CandidateListAPIRequest,
 } from '@models';
 
 
@@ -119,3 +121,23 @@ export function requestJobsListQueryMapping(query: any): IJobsListAPIRequest {
 }
 
 
+export function requestCandidateListQueryMapping(query: any): ICandidateListAPIRequest {
+    logger.info('helpers.data_mapping.request_query.requestCandidateListQueryMapping() ');
+    try {
+        if (query?.pageNum === '') {
+            query.pageNum = Pagination.PAGE_NUM;
+        }
+        if (query?.pageSize === '') {
+            query.pageSize = Pagination.PAGE_SIZE;
+        }
+        return new CandidateListAPIRequest(
+            query?.searchText || '',
+            query?.pageNum,
+            query?.pageSize,
+            query?.status
+        )
+    } catch (error) {
+        logger.error(`ERROR occurred in helpers.data_mapping.request_query.requestJobsListQueryMapping() `);
+        throw error;
+    }
+}

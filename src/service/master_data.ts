@@ -4,6 +4,7 @@ import { getConnection, releaseConnection } from "@db/helpers/transaction";
 import { MasterData } from "@db/queries";
 import logger from "@logger";
 import { IListAPIResponse, IMasterData, IMasterDataListAPIRequest, IServiceResponse, IUserSession, ListAPIResponse, ServiceResponse } from "@models";
+import * as JobsData from '@mongodb/helpers/lib/jobs';
 const TAG = 'service.master_data'
 
 // job type
@@ -977,6 +978,21 @@ export async function getCourseCategoriesByUid(categoryUid: string, userSession:
     serviceResponse.addServerError('Failed to fetched course category details due to tech difficulties');
   } finally {
     await releaseConnection(connection);
+  }
+  return serviceResponse;
+}
+
+export async function getJobRoles(userSession: IUserSession): Promise<IServiceResponse> {
+  logger.info(`${TAG}.getJobRoles() `);
+  const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, 'Data fetched succesfully');
+  try {
+    const jobRoles = await JobsData.getJobRoles(userSession.userId);
+    const jobRoleList = jobRoles.map(job => job.jobRole);
+    const distinctJobRoles = [...new Set(jobRoleList)];
+    serviceResponse.data = distinctJobRoles;
+  } catch (error) {
+    logger.error(`ERROR occurred in ${TAG}.getJobRoles() `, error);
+    serviceResponse.addServerError('Failed to fetch job roles due to tech difficulties');
   }
   return serviceResponse;
 }

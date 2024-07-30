@@ -3,6 +3,7 @@ import * as APIPaths from '@constants/api_path_constants';
 import { isAdmin, isUser } from '@middleware/authentication';
 import * as controller from '@controller/templates'
 import { USER_ROLES } from "@constants/master_data_constants";
+import * as validations from '@validations'
 const router = Router();
 
 router.route(APIPaths.MASTER_TEMPLATES)
@@ -10,7 +11,7 @@ router.route(APIPaths.MASTER_TEMPLATES)
     .get(isAdmin, controller.getMasterTemplates)
 
 router.route(APIPaths.TEMPLATES)
-    .post(isAdmin, controller.saveTemplates)
+    .post(validations.validateTemplate, isAdmin, controller.saveTemplates)
     .get(isUser([USER_ROLES.admin, USER_ROLES.recruiter]), controller.getTemplates)
 
 router.route(APIPaths.TEMPLATE_BY_UID)

@@ -1,6 +1,6 @@
 import { JOB_STATUS } from "@constants/master_data_constants";
 import logger from "@logger";
-import { IJobs } from "@models";
+import { IJobs, IUserSession } from "@models";
 import Jobs from '@mongodb/models/jobs';
 import StudentJobs from "@mongodb/models/student_jobs";
 import { toCamelCase } from "@utils/formatter";
@@ -28,7 +28,7 @@ export async function checkJobNameExists(jobTitleName: string, userId: number, j
         throw error;
     }
 }
-export async function addJobs(payload: IJobs, templateDetails: any, userId: number) {
+export async function addJobs(payload: IJobs, templateDetails: any, userSession: IUserSession) {
     logger.info(TAG + '.addJobs()');
     try {
         const jdTemplates = new Jobs({
@@ -36,7 +36,8 @@ export async function addJobs(payload: IJobs, templateDetails: any, userId: numb
             template_uid: payload.templateUid,
             program_id: templateDetails.programId,
             category_id: templateDetails.categoryId,
-            recruiter_id: userId,
+            recruiter_id: userSession.userId,
+            recruiter_uid: userSession.userUid,
             category_name: templateDetails.categoryName,
             job_title: templateDetails.jobTitle,
             description: payload.description,
@@ -60,7 +61,7 @@ export async function addJobs(payload: IJobs, templateDetails: any, userId: numb
             job_status: JOB_STATUS.drafted,
             previous_status: JOB_STATUS.drafted,
             requested_on: new Date(),
-            created_by: userId
+            created_by: userSession.userId
         });
         const result = await jdTemplates.save();
         return toCamelCase(result?.toObject());
@@ -430,6 +431,21 @@ export async function getJobRoles(recruiterId: number): Promise<any> {
         return jobs.map(item => toCamelCase(item.toObject()));
     } catch (error) {
         logger.error(`ERROR occurred in ${TAG}.getJobRoles() `, error);
+        throw error;
+    }
+}
+
+export async function getRecruiterCreatedJobs(templateUids: any, recruiterUid: string): Promise<any> {
+    logger.info(TAG + '.getRecruiterCreatedJobs() ');
+    try {
+        const jobs = await findAllRecords(Jobs, {
+            recruiter_uid: recruiterUid,
+            template_uid: { $in: templateUids },
+        },
+            { _id: 0, template_uid: 1 });
+        return jobs;
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.getRecruiterCreatedJobs() `, error);
         throw error;
     }
 }

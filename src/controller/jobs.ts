@@ -105,7 +105,8 @@ export async function applyStudentJob(req: any, res: Response, next: NextFunctio
         logger.info(TAG + `.applyStudentJob() `);
         const { jobUid } = req.params;
         const userSession: IUserSession = req.userSession;
-        const jobResponse: IServiceResponse = await jobService.applyStudentJob(jobUid, userSession);
+        const token = req.headers.authorization.split(' ')[1];
+        const jobResponse: IServiceResponse = await jobService.applyStudentJob(jobUid, userSession, token);
         responseBuilder(jobResponse, res, next, req);
     } catch (error) {
         logger.error(`ERROR occurred in ${TAG}.applyStudentJob() `, error);

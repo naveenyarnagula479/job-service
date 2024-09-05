@@ -4,7 +4,7 @@ import logger from "@logger"
 import { IMasterData, IUserSession } from "@models"
 import { toCamelCase } from "@utils/formatter"
 import crypto from 'crypto'
-import { PoolClient } from "pg"
+import { Pool, PoolClient } from "pg"
 
 const TAG = "data_stores_mysql_lib_master_data"
 
@@ -921,6 +921,75 @@ export async function getTools(connection: PoolClient, categoryId?: number): Pro
         return toCamelCase(result);
     } catch (error) {
         logger.error(`ERROR occured in ${TAG}.getTools() `, error);
+        throw error;
+    }
+}
+
+export async function getToolsByIds(connection: PoolClient, toolIds: any): Promise<any> {
+    logger.info(`${TAG}.getToolsByIds() `);
+    try {
+        const query: string = `select id, name from tools where id in (${toolIds}) and is_deleted = false`;
+        const result = await fetchRecords(connection, query, []);
+        console.log("result",result)
+        return result;
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.getToolsByIds() `, error);
+        throw error;
+    }
+}
+
+export async function getSkillsByIds(connection: PoolClient, skillIds: any): Promise<any> {
+    logger.info(TAG + '.getSkillsBYIds() ');
+    try {
+        const query: string = `select id, name from skills where id in (${skillIds}) and is_deleted = false`;
+        return await fetchRecords(connection, query, []);
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.getSkillsByIds() `, error);
+        throw error;
+    }
+}
+
+export async function getInterviewsByIds(connection: PoolClient, interviewIds: any): Promise<any> {
+    logger.info(TAG + '.getInterviewsByIds() ');
+    console.log("ids",interviewIds)
+    try {
+        const query: string = `select id, name from interview_rounds where id in (${interviewIds}) and is_deleted = false`;
+        return await fetchRecords(connection, query, []);
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.getInterviewsByIds() `, error);
+        throw error;
+    }
+}
+
+export async function getEmploymentTypeById(connection: PoolClient, employmentTypeId: number): Promise<any> {
+    logger.info(TAG + '.getEmploymentTypeById() ');
+    try {
+        const query: string = `select id, name from employment_types where id = $1 and is_deleted = false`;
+        return await fetchRecord(connection, query, [employmentTypeId]);
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.getEmploymentTypeById() `, error);
+        throw error;
+    }
+}
+
+export async function getJobTypeById(connection: PoolClient, jobTypeId: number): Promise<any> {
+    logger.info(TAG + '.getJobTypeById() ');
+    try {
+        const query: string = `select id, name from job_types where id = $1 and is_deleted = false`;
+        return await fetchRecord(connection, query, [jobTypeId]);
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.getJobTypeById() `, error);
+        throw error;
+    }
+}
+
+export async function getShiftsById(connection: PoolClient, shiftTypeId: number): Promise<any> {
+    logger.info(TAG + '.getShiftsById() ');
+    try {
+        const query: string = `select id, name from job_shifts where id = $1 and is_deleted = false`;
+        return await fetchRecord(connection, query, [shiftTypeId]);
+    } catch (error) {
+        logger.error(`ERROR occurred in ${TAG}.getShiftsById() `, error);
         throw error;
     }
 }

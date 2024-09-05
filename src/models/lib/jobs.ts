@@ -30,6 +30,7 @@ interface Interview {
 export type IJobs = IAuditInfo & {
     id: number
     uid: string
+    categoryId: number
     templateUid: string
     description: string
     tools: Tools[]
@@ -54,6 +55,7 @@ export type IJobs = IAuditInfo & {
 export class jobs extends AuditInfo implements IAuditInfo {
     public id: number
     public uid: string
+    public categoryId: number
     public templateUid: string
     public description: string
     public tools: Tools[]
@@ -73,7 +75,8 @@ export class jobs extends AuditInfo implements IAuditInfo {
     public salary: number
     public salaryType: string
     public experience: number
-    constructor(templateUid: string,
+    constructor(categoryId: number,
+        templateUid: string,
         description: string,
         tools: Tools[],
         skills: Skills[],
@@ -98,6 +101,7 @@ export class jobs extends AuditInfo implements IAuditInfo {
         lastUpdatedTime?: Date
     ) {
         super(createdBy, creationTime, lastUpdatedBy, lastUpdatedTime);
+        this.categoryId = categoryId
         this.templateUid = templateUid
         this.description = description
         this.tools = tools

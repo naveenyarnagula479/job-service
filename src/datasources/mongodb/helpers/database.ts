@@ -17,7 +17,8 @@ export async function getMongoConnection() {
             return;
         }
         // let URL = `mongodb://localhost:27017/lms?appname=MongoDB%20Compass&ssl=false`
-        let URL = `mongodb://cpdevusr2:sjfio4Qw24Juysds86MBGTu@3.109.121.136:12088/lms?&appname=MongoDB%20Compass&ssl=false`
+        // let URL = `mongodb://cpdevusr2:sjfio4Qw24Juysds86MBGTu@3.109.121.136:12088/lms?&appname=MongoDB%20Compass&ssl=false`
+        let URL;
         if (MONGO_DATABASE?.username?.length && MONGO_DATABASE?.password?.length) {
             URL = `mongodb://${MONGO_DATABASE.username}:${MONGO_DATABASE.password}@${MONGO_DATABASE.address}:${MONGO_DATABASE.port}/${MONGO_DATABASE.name}?&appname=MongoDB%20Compass&ssl=false`;
         }

@@ -122,11 +122,11 @@ export class masterTemplates extends AuditInfo implements IAuditInfo {
         this.preferredSkills = preferredSkills
         this.aboutCompany = aboutCompany
         this.education = education
+        this.jobValidUpto = jobValidUpto
         this.location = location
         this.noOfOpenings = noOfOpenings
         this.salary = salary
         this.salaryType = salaryType
         this.experience = experience
-        this.jobValidUpto = jobValidUpto
     }
 }

@@ -1,16 +1,16 @@
 import logger from "@logger";
-import { ITemplates } from "@models";
+import { AppError, ITemplates } from "@models";
 import JDTemplates from '@mongodb/models/jd_template';
 import { toCamelCase } from "@utils/formatter";
 import mongoose from "mongoose";
 import { countDocuments, findAllRecords, findOne, findOneAndUpdate } from '../query';
+import { HttpStatusCodes } from "@constants/status_codes";
 
 
 const TAG = 'datasources.mongodb.helpers.lib.jd_templates';
 
 export async function addJDTemplates(payload: ITemplates, userId: number, programId: number, categoryName: string) {
     logger.info(TAG + '.addJDTemplates()');
-    console.log("bsajdfs093",payload)
     try {
         const jdTemplates = new JDTemplates({
             template_uid: new mongoose.Types.ObjectId(),
@@ -84,11 +84,22 @@ export async function getTemplatesWithPagination(queryParams: any) {
 }
 export async function getTemplateByUid(jdTemplateUid: string) {
     logger.info(TAG + '.getTemplateByUid ');
+    console.log("jdTemplate", jdTemplateUid)
     try {
         const result = await findOne(JDTemplates, { 'template_uid': jdTemplateUid, 'is_deleted': false }, { _id: 0 });
         return toCamelCase(result?.toObject());
     } catch (error) {
         logger.error(`ERROR occurred in ${TAG}.getTemplateByUid() `, error);
+        throw error;
+    }
+}
+export async function checkCategoryIdExists(categoryId: number, templateUid: string){
+    logger.info(TAG +'.checkCategoryIdExists()');
+    try{
+        const result = await findOne(JDTemplates, {'template_uid': templateUid, category_id: categoryId, 'is_deleted': false},{_id:0});
+        return toCamelCase(result?.toObject());
+    }catch(error){
+        logger.error(`ERROR occurred in ${TAG}.checkCategoryIdExists()`, error);
         throw error;
     }
 }

@@ -134,7 +134,8 @@ export function requestCandidateListQueryMapping(query: any): ICandidateListAPIR
             query?.searchText || '',
             query?.pageNum,
             query?.pageSize,
-            query?.status
+            query?.status,
+            query?.jobRole
         )
     } catch (error) {
         logger.error(`ERROR occurred in helpers.data_mapping.request_query.requestJobsListQueryMapping() `);

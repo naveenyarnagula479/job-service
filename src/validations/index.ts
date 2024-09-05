@@ -1,7 +1,20 @@
-import {validateMasterData,updateJobType,getJobTypeByUid,updateEmploymentType,getEmploymentTypeByUid,updateJobShifts,getJobShiftsByUid,saveCourseCategory,updateCourseCategory,getCourseCategoriesByUid,validateMasterDataWithCategoryId,updateSkill,fetchSkillByUid,updateTool,fetchToolByUid,updateInterviewRound,fetchInterviewRoundByUid,getMasterData} from './master_data'
+import {
+    validateMasterData, updateJobType, getJobTypeByUid, updateEmploymentType, getEmploymentTypeByUid, updateJobShifts,
+    getJobShiftsByUid, saveCourseCategory, updateCourseCategory, getCourseCategoriesByUid, validateMasterDataWithCategoryId,
+    updateSkill, fetchSkillByUid, updateTool, fetchToolByUid, updateInterviewRound, fetchInterviewRoundByUid, getMasterData
+} from './master_data'
+import {
+    validateTemplate, getTemplate, templateUid, updateTemplates
+} from './templates';
 
+import {
+    validateJobs, jobUid,updateJobs, updateStudentJobStatus, getJobsByStudentUid, updateJobStatus, saveStudentJobs, candidates
+} from './jobs';
 
-import { saveMasterTemplate, saveTemplates, getTemplates, templateUid, updateTemplate } from "./templates";
-import { saveJobs, getJobs, jobUid, updateJob, updateJobStatus, saveStudentJobs} from "./jobs"
-export { saveMasterTemplate, saveTemplates, getTemplates, templateUid, updateTemplate, saveJobs, getJobs, jobUid,updateJob, validateMasterData,updateJobType,getJobTypeByUid,updateEmploymentType,getEmploymentTypeByUid,updateJobShifts,getJobShiftsByUid,saveCourseCategory,updateCourseCategory,getCourseCategoriesByUid,validateMasterDataWithCategoryId,updateSkill, fetchSkillByUid,updateTool,fetchToolByUid,updateInterviewRound,fetchInterviewRoundByUid,getMasterData, updateJobStatus, saveStudentJobs}
-
+export {
+    validateMasterData, updateJobType, getJobTypeByUid, updateEmploymentType, getEmploymentTypeByUid, updateJobShifts,
+    getJobShiftsByUid, saveCourseCategory, updateCourseCategory, getCourseCategoriesByUid, validateMasterDataWithCategoryId,
+    updateSkill, fetchSkillByUid, updateTool, fetchToolByUid, updateInterviewRound, fetchInterviewRoundByUid, getMasterData,
+    validateTemplate, validateJobs, getTemplate, templateUid, updateTemplates, jobUid, updateJobs, updateStudentJobStatus, getJobsByStudentUid,
+    updateJobStatus, saveStudentJobs, candidates
+}

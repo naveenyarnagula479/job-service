@@ -59,7 +59,7 @@ export async function pendingJobNotification(payload: any, user: any) {
 </div>
 </body>
 </html>`
-        const response = await sendEmail('naveen@careerpedia.co', payload.subject, payload.html);
+        const response = await sendEmail(user.email, payload.subject, payload.html);
         logger.info(JSON.stringify(response));
         return;
     } catch (error) {
@@ -140,7 +140,7 @@ export async function activeJobNotification(payload: any, user: any, jobDetails:
 </div>
 </body>
 </html>`
-        const response = await sendEmail('naveen@careerpedia.co', payload.subject, payload.html);
+        const response = await sendEmail(user.email, payload.subject, payload.html);
         logger.info(JSON.stringify(response));
         return;
     } catch (error) {
@@ -214,7 +214,7 @@ export async function inActiveJobNotification(payload: any, user: any, jobDetail
 </div>
 </body>
 </html>`
-        const response = await sendEmail('naveen@careerpedia.co', payload.subject, payload.html);
+        const response = await sendEmail(user.email, payload.subject, payload.html);
         logger.info(JSON.stringify(response));
         return;
     } catch (error) {

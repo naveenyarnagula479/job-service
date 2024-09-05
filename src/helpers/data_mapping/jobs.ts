@@ -6,6 +6,7 @@ export function jobsDataMapping(payload: any): IJobs {
     try {
         if (payload != null && payload !== undefined) {
             return new jobs(
+                payload.categoryId,
                 payload.templateUid,
                 payload.description,
                 payload.tools,

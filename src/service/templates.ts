@@ -1,10 +1,13 @@
+import { USER_ROLES } from "@constants/master_data_constants";
 import { HttpStatusCodes } from "@constants/status_codes";
 import { getConnection, releaseConnection } from "@db/helpers/transaction";
-import { templatesData } from '@db/queries';
+import { MasterData, templatesData } from '@db/queries';
 import logger from "@logger";
 import { IListAPIResponse, IMasterTemplates, IServiceResponse, ITemplates, IUserSession, ListAPIResponse, ServiceResponse } from "@models";
 import * as TemplateData from '@mongodb/helpers/lib/jd_template';
+import * as JobsData from '@mongodb/helpers/lib/jobs'
 import * as MasterTemplateData from '@mongodb/helpers/lib/master_template';
+import { PoolClient } from "pg";
 
 const TAG = 'service.templates'
 
@@ -89,7 +92,20 @@ export async function getTemplates(queryParams: any, userSession: IUserSession):
         connection = await getConnection();
         const categoryDetails = await templatesData.checkCourseCategoryIdExists(connection, queryParams.categoryId)
         if (categoryDetails) {
-            const { list, totalResultsCount } = await TemplateData.getTemplatesWithPagination(queryParams)
+            let { list, totalResultsCount } = await TemplateData.getTemplatesWithPagination(queryParams);
+            if (userSession.role === USER_ROLES.recruiter) {
+                const templateUids = list.map(template => template.templateUid);
+                const recruiterCreatedJobs = await JobsData.getRecruiterCreatedJobs(templateUids, userSession.userUid);
+                for (var index in list) {
+                    const data = list[index];
+                    data.isJobCreated = false;
+                    recruiterCreatedJobs.map(job => {
+                        if (job.template_uid === data.templateUid) {
+                            data.isJobCreated = true;
+                        }
+                    })
+                }
+            }
             let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
             if (offset < 0) {
                 offset = 0;
@@ -121,10 +137,8 @@ export async function getTemplates(queryParams: any, userSession: IUserSession):
 }
 export async function updateTemplatesByUid(userSession: IUserSession, templates: ITemplates, templateUid: any): Promise<IServiceResponse> {
     logger.info(`${TAG}.updateTemplatesByUid() `);
-    let connection = null;
     const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, 'templates updated successfully');
     try {
-        connection = await getConnection();
         const isJobTitleExist = await TemplateData.checkJobTitleNameExists(templates.jobTitle, templates.categoryId, templateUid)
         if (isJobTitleExist.templateUid) {
             serviceResponse.addBadRequestError('job title already exist');
@@ -144,8 +158,6 @@ export async function updateTemplatesByUid(userSession: IUserSession, templates:
         logger.error(`ERROR occured in ${TAG}.updateTemplatesByUid() `, error);
         serviceResponse.addServerError(`Failed to update templates due to technical difficulties`);
         throw error;
-    } finally {
-        await releaseConnection(connection)
     }
     return serviceResponse;
 }
@@ -157,6 +169,18 @@ export async function getTemplatesByUid(userSession: IUserSession, templateUid: 
         connection = await getConnection();
         const jdTemplate = await TemplateData.getTemplateByUid(templateUid);
         if (jdTemplate?.templateUid) {
+            const toolIds = jdTemplate.tools.map(item => parseInt(item.id));
+            const skillIds = jdTemplate.skills.map(item => parseInt(item.id));
+            const employmentTypeId = jdTemplate.employmentType.id;
+            const jobTypeId = jdTemplate.jobType.id;
+            const shiftId = jdTemplate.shifts.id;
+            const interviewIds = jdTemplate.interview.map(item => parseInt(item.id));
+            jdTemplate.tools = await MasterData.getToolsByIds(connection, toolIds);
+            jdTemplate.skills = await MasterData.getSkillsByIds(connection, skillIds);
+            jdTemplate.interview = await MasterData.getInterviewsByIds(connection, interviewIds);
+            jdTemplate.employmentType = await MasterData.getEmploymentTypeById(connection, employmentTypeId);
+            jdTemplate.jobType = await MasterData.getJobTypeById(connection, jobTypeId);
+            jdTemplate.shifts = await MasterData.getShiftsById(connection, shiftId);
             serviceResponse.data = jdTemplate
         } else {
             serviceResponse.addBadRequestError('template Uid does\t exist')
@@ -170,12 +194,12 @@ export async function getTemplatesByUid(userSession: IUserSession, templateUid: 
     }
     return serviceResponse;
 }
+
+
 export async function deleteTemplatesByUid(userSession: IUserSession, templateUid: string): Promise<IServiceResponse> {
     logger.info(`${TAG}.deleteTemplatesByUid() `);
-    let connection = null;
     const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, 'templates deleted successfully');
     try {
-        connection = await getConnection();
         const jdTemplate = await TemplateData.getTemplateByUid(templateUid)
         if (jdTemplate?.templateUid) {
             await TemplateData.deleteTemplatesByUid(templateUid, userSession.userId)
@@ -189,8 +213,6 @@ export async function deleteTemplatesByUid(userSession: IUserSession, templateUi
         logger.error(`ERROR occured in ${TAG}.deleteTemplatesByUid() `, error);
         serviceResponse.addServerError(`Failed to delete templates due to technical difficulties`);
         throw error;
-    } finally {
-        await releaseConnection(connection);
     }
     return serviceResponse;
 }

@@ -26,9 +26,14 @@ export async function saveJobDetails(userSession: IUserSession, jobDetails: IJob
             const isJobExist = await JobsData.checkJobNameExists(templateDetails.jobTitle, userSession.userId);
             if (isJobExist.templateUid) {
                 serviceResponse.addBadRequestError('job name already exist');
+            }
+            const categoryIdExist = await TemplateData.checkCategoryIdExists(jobDetails.categoryId, jobDetails.templateUid);
+            if(!categoryIdExist.categoryId){
+                serviceResponse.addBadRequestError('categoryId doesn\t exist')
             } else {
-                const jobInformation = await JobsData.addJobs(jobDetails, templateDetails, userSession.userId);
+                const jobInformation = await JobsData.addJobs(jobDetails, templateDetails, userSession);
                 serviceResponse.data = { jobUid: jobInformation.jobUid }
+                console.log("jshdjfha")
             }
         } else {
             serviceResponse.addBadRequestError('job template  doesn\'t exist');
@@ -249,7 +254,7 @@ async function getAdminJobsWithPagination(queryParams: any, userSession: IUserSe
     }
 }
 export async function updateJobsByUid(userSession: IUserSession, jobDetails: IJobs, jobUid: any): Promise<IServiceResponse> {
-    logger.info(`${TAG}.updateTemplatesByUid() `);
+    logger.info(`${TAG}.updateJobsByUid() `);
     const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, 'jobs updated successfully');
     try {
         const jobData = await JobsData.getJobsByUid(jobUid);
@@ -295,7 +300,8 @@ export async function getJobsByUid(userSession: IUserSession, jobUid: string): P
                 jobDetails = {
                     ...jobDetails,
                     ...recruiterData,
-                    ...(studentJob.isSaved) ? { 'isSaved': true } : { 'isSaved': false }
+                    ...(studentJob.isSaved) ? { 'isSaved': true } : { 'isSaved': false },
+                    ...studentJob
                 };
             }
             serviceResponse.data = jobDetails;
@@ -378,6 +384,11 @@ export async function updateJobStatus(userSession: IUserSession, jobUid: string,
 async function updateJobStatusByRecruiter(userSession: IUserSession, payload: any, jobDetails: any, serviceResponse: IServiceResponse) {
     logger.info(TAG + '.updateJobStatusByRecruiter() ');
     try {
+        const ALLOWED_STATUSES = new Set([JOB_STATUS.drafted, JOB_STATUS.active, JOB_STATUS.inActive]);
+        if (!ALLOWED_STATUSES.has(payload.status)) {
+            serviceResponse.addBadRequestError('Invalid job status');
+            return;
+        }
         if (jobDetails.jobStatus === JOB_STATUS.active) {
             if (payload.status === JOB_STATUS.inActive) {
                 const result = await JobPostingMessagesData.addJobPostingMessage(payload, jobDetails.jobUid, userSession.userId);
@@ -398,16 +409,23 @@ async function updateJobStatusByRecruiter(userSession: IUserSession, payload: an
 async function updateJobStatusByAmdin(userSession: IUserSession, payload: any, jobDetails: any, serviceResponse: IServiceResponse) {
     logger.info(TAG + '.updateJobStatusByAdmin() ');
     try {
+        const ALLOWED_STATUSES = new Set([JOB_STATUS.onHold, JOB_STATUS.active, JOB_STATUS.inActive]);
         const url = AUTH_SERVICE_CONF.baseUrl + AUTH_SERVICE_CONF.recruiter + `/${jobDetails.createdBy}`;
         const userReponse = await axios.get(url);
         const user = userReponse?.data?.data;
         if (user) {
+            if (!ALLOWED_STATUSES.has(payload.status)) {
+             
+                serviceResponse.addBadRequestError('Invalid job status');
+                return;
+            }
             if (jobDetails.jobStatus !== JOB_STATUS.drafted && jobDetails.jobStatus !== JOB_STATUS.expired &&
                 jobDetails.jobStatus !== JOB_STATUS.inActive && jobDetails.jobStatus !== JOB_STATUS.onHold) {
                 const result = await JobPostingMessagesData.addJobPostingMessage(payload, jobDetails.jobUid, userSession.userId);
                 switch (payload.status) {
                     case JOB_STATUS.onHold:
                         if (jobDetails.jobStatus !== JOB_STATUS.active) {
+                           
                             await JobsData.updateJobStatus(jobDetails.jobUid, userSession.userId, payload.status, jobDetails.jobStatus, result.messageUid);
                             pendingJobNotification(payload, user);
                         } else {
@@ -448,6 +466,8 @@ async function validRequestForUpdateJobStatus(payload: any) {
         if (payload.status === JOB_STATUS.active) {
             payload.subject = 'Your Job Posting on CareerPedia Has Been Approved!';
             payload.description = `We are glad to inform you that your job posting on our CareerPedia platform has been approved.`
+        }else{
+            payload.subject ='Your Job Posting on Careerpedia had been deactive';
         }
         return payload;
     } catch (error) {
@@ -456,14 +476,17 @@ async function validRequestForUpdateJobStatus(payload: any) {
     }
 }
 
-export async function applyStudentJob(jobUid: string, userSession: IUserSession): Promise<IServiceResponse> {
+export async function applyStudentJob(jobUid: string, userSession: IUserSession, token: any): Promise<IServiceResponse> {
     const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.CREATED, 'Job applied successfully');
     try {
         const jobDetails = await JobsData.getJobsByUid(jobUid);
-        console.log("123",jobDetails)
         if (jobDetails.jobStatus === JOB_STATUS.active) {
-            const url = AUTH_SERVICE_CONF.baseUrl + AUTH_SERVICE_CONF.student + `/${userSession.userId}`;
-            const response = await axios.get(url);
+            const url = AUTH_SERVICE_CONF.baseUrl + AUTH_SERVICE_CONF.student + `/${userSession.userUid}`;
+            const response = await axios.get(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             const student = response?.data.data;
             if (student.resumeFileUid) {
                 const studentJobDetails = await StudentJobData.getStudentJobByUid(jobUid, userSession.userId);
@@ -480,7 +503,11 @@ export async function applyStudentJob(jobUid: string, userSession: IUserSession)
         }
     } catch (error) {
         logger.error(`ERROR occurred in ${TAG}.applyStudentJob() `, error);
-        serviceResponse.addServerError(`Failed to save apply job due to tech difficulties`);
+        if (error.message.includes('ECONNREFUSED')) {
+            serviceResponse.addBadRequestError('Client server isn\'t active');
+        } else {
+            serviceResponse.addServerError(`Failed to save apply job due to tech difficulties`);
+        }
     }
     return serviceResponse;
 }
@@ -512,7 +539,8 @@ export async function fetchAppliedCandidates(userSession: IUserSession, queryPar
     const serviceResponse: IServiceResponse = new ServiceResponse(HttpStatusCodes.OK, 'data fetched successfully');
     try {
         const allJobs = await JobsData.getRecruiterJobsAppliedStudents(userSession.userId, queryParams);
-        const studentIds = allJobs.map(job => job.studentId).join(',');
+        const studentIdsSet = new Set(allJobs.map(job => job.studentId));
+        const studentIds = Array.from(studentIdsSet).join(',');
         const url = AUTH_SERVICE_CONF.baseUrl + AUTH_SERVICE_CONF.student;
         const response = await axios.get(url, {
             headers: {
@@ -525,17 +553,33 @@ export async function fetchAppliedCandidates(userSession: IUserSession, queryPar
             const student = studentList.find(student => parseInt(student.studentId) === job.studentId);
             return { ...job, ...student };
         });
+        // let filteredData = queryParams.searchText ? combinedData.filter(item => {
+        //     console.log(item);
+        //     const userNameMatches = item.studentName.toLowerCase().includes(queryParams.searchText.toLowerCase());
+        //     const emailMatches = item.email.toLowerCase().includes(queryParams.searchText.toLowerCase());
+        //     return emailMatches || userNameMatches;
+        // }) : combinedData;
 
-        let filteredData = queryParams.searchText ? combinedData.filter(item => {
-            const userNameMatches = item.studentName.toLowerCase().includes(queryParams.searchText.toLowerCase());
-            const emailMatches = item.email.toLowerCase().includes(queryParams.searchText.toLowerCase());
-            return emailMatches || userNameMatches;
-        }) : combinedData;
+        // if (queryParams.jobRole != undefined && queryParams.jobRole !== '') {
+        //     filteredData = filteredData.filter(item => {
+        //         return item.jobRole === queryParams.jobRole;
+        //     })
+        // }
 
-        if (queryParams.jobRole != undefined && queryParams.jobRole !== '') {
-            filteredData = filteredData.filter(item => {
-                return item.jobRole === queryParams.jobRole;
-            })
+        let filteredData = combinedData;
+        console.log(studentList);
+        // console.log(filteredData);
+        if (queryParams.searchText) {
+            const searchText = queryParams.searchText.toLowerCase();
+            filteredData = combinedData.filter(item => {
+                const userNameMatches = item.studentName && item.studentName.toLowerCase().includes(searchText);
+                const emailMatches = item.email && item.email.toLowerCase().includes(searchText);
+                return emailMatches || userNameMatches;
+            });
+        }
+
+        if (queryParams.jobRole) {
+            filteredData = filteredData.filter(item => item.jobRole === queryParams.jobRole);
         }
         let offset: number = (queryParams.pageNum - 1) * queryParams.pageSize;
         if (offset < 0) {

@@ -19,6 +19,7 @@ const jdTemplateSchema = new mongoose.Schema({
     template_uid: {
         type: String,
         required: true,
+        unique: true
     },
     job_title: {
         type: String,

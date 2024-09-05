@@ -28,8 +28,7 @@ export const JOB_ROLE = `/job-role`;
 export const ROUTER_TEMPLATES = `/`;
 export const ROUTER_JOBS = '/';
 
-export const 
-MASTER_TEMPLATES = '/master-template';
+export const MASTER_TEMPLATES = '/master-template';
 export const TEMPLATES = '/template';
 export const TEMPLATE_BY_UID = `${TEMPLATES}/:templateUid`;
 

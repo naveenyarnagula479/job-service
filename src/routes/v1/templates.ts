@@ -1,20 +1,22 @@
 import { Router } from "express";
 import * as APIPaths from '@constants/api_path_constants';
-import { isAdmin } from '@middleware/authentication';
-import * as controller from '@controller/templates';
-import * as validation from '@validations';
+import { isAdmin, isUser } from '@middleware/authentication';
+import * as controller from '@controller/templates'
+import { USER_ROLES } from "@constants/master_data_constants";
+import * as validations from '@validations'
 const router = Router();
 
 router.route(APIPaths.MASTER_TEMPLATES)
-    .post(isAdmin,controller.saveMasterTemplates)
-    .get(isAdmin,controller.getMasterTemplates)
+    .post(isAdmin, controller.saveMasterTemplates)
+    .get(isAdmin, controller.getMasterTemplates)
 
 router.route(APIPaths.TEMPLATES)
-    .post(validation.saveTemplates, isAdmin, controller.saveTemplates)
-    .get(validation.getTemplates, isAdmin,controller.getTemplates)
+    .post(validations.validateTemplate, isAdmin, controller.saveTemplates)
+    .get(validations.getTemplate,isUser([USER_ROLES.admin, USER_ROLES.recruiter]), controller.getTemplates)
+
 router.route(APIPaths.TEMPLATE_BY_UID)
-    .put(validation.updateTemplate,isAdmin,controller.updateTemplatesByUid)
-    .get(validation.templateUid,isAdmin,controller.getTemplatesByUid)
-    .delete(validation.templateUid,isAdmin, controller.deleteTemplatesByUid)
-    
+    .put(validations.updateTemplates,isAdmin, controller.updateTemplatesByUid)
+    .get(validations.templateUid,isUser([USER_ROLES.admin, USER_ROLES.recruiter]), controller.getTemplatesByUid)
+    .delete(validations.templateUid,isAdmin, controller.deleteTemplatesByUid)
+
 export default router;
